@@ -55,7 +55,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, CreateAccountActivity.class);
+                //TODO:  change this back this is just for testing
+                //Intent intent = new Intent(MainActivity.this, CreateAccountActivity.class);
+                //startActivity(intent);
+
+                Intent intent = new Intent(MainActivity.this, CreateRestaurant.class);
                 startActivity(intent);
             }
         });
