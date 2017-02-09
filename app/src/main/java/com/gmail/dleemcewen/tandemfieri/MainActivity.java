@@ -55,11 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                //TODO:  change this back this is just for testing
-                //Intent intent = new Intent(MainActivity.this, CreateAccountActivity.class);
-                //startActivity(intent);
-
-                Intent intent = new Intent(MainActivity.this, CreateRestaurant.class);
+                Intent intent = new Intent(MainActivity.this, CreateAccountActivity.class);
                 startActivity(intent);
             }
         });
@@ -74,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
                             Toast
                                     .makeText(getApplicationContext(), task.getResult().getUser().getEmail() +" was successfully signed in", Toast.LENGTH_LONG)
                                     .show();
+
+                            //TODO:  this needs to be moved it is just here for testing
+                            Intent intent = new Intent(MainActivity.this, CreateRestaurant.class);
+                            intent.putExtra("ownerId", task.getResult().getUser().getUid());
+                            startActivity(intent);
                         } else {
                             Toast
                                     .makeText(getApplicationContext(), "Sign in was not successful", Toast.LENGTH_LONG)

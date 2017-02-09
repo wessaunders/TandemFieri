@@ -27,6 +27,7 @@ public class CreateRestaurant extends AppCompatActivity {
     private Button businessHours;
     private Button deliveryArea;
     private Button createRestaurant;
+    private String restaurantOwnerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,7 @@ public class CreateRestaurant extends AppCompatActivity {
      */
     private void initialize() {
         restaurantsRepository = new Restaurants<>();
+        restaurantOwnerId = getIntent().getStringExtra("ownerId");
     }
 
     /**
@@ -120,6 +122,7 @@ public class CreateRestaurant extends AppCompatActivity {
         restaurant.setState(state.getText().toString());
         restaurant.setZipcode(zipCode.getText().toString());
         restaurant.setCharge(Double.valueOf(deliveryCharge.getText().toString()));
+        restaurant.setOwnerId(restaurantOwnerId);
 
         return restaurant;
     }

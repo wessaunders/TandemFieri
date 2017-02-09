@@ -11,8 +11,8 @@ public class Restaurant extends Entity {
     private String city;
     private String state;
     private String zipcode;
-
     private Double charge;
+    private String ownerId;
 
     /**
      * Default constructor
@@ -129,5 +129,21 @@ public class Restaurant extends Entity {
      */
     public void setCharge(Double charge) {
         this.charge = charge;
+    }
+
+    /**
+     * gets the restaurant owner id
+     * @return restaurant owner id
+     */
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    /**
+     * sets the restaurant owner id
+     * @param ownerId uniquely identifies the restaurant owner
+     */
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 }
