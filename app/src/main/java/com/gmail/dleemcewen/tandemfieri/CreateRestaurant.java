@@ -1,5 +1,6 @@
 package com.gmail.dleemcewen.tandemfieri;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -8,10 +9,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
+import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 import com.gmail.dleemcewen.tandemfieri.Validator.Validator;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.firebase.database.DatabaseError;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class CreateRestaurant extends AppCompatActivity {
     private Restaurants<Restaurant> restaurantsRepository;
@@ -82,8 +93,35 @@ public class CreateRestaurant extends AppCompatActivity {
                     //build a new restaurant
                     Restaurant restaurant = buildNewRestaurant();
 
-                    //save the restaurant record
-                    restaurantsRepository.add(restaurant);
+                    //add the restaurant record
+                    //and then check the return value to ensure the restaurant was created successfully
+                    restaurantsRepository
+                        .add(restaurant)
+                        .continueWith(new Continuation<AbstractMap.SimpleEntry<Boolean ,DatabaseError>,
+                                Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>>>() {
+                            @Override
+                            public Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>> then(@NonNull Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>> task)
+                                    throws Exception {
+                                TaskCompletionSource<AbstractMap.SimpleEntry<Boolean, DatabaseError>> taskCompletionSource =
+                                    new TaskCompletionSource<>();
+
+                                AbstractMap.SimpleEntry<Boolean, DatabaseError> taskResult = task.getResult();
+                                StringBuilder toastMessage = new StringBuilder();
+
+                                if (taskResult.getKey()) {
+                                    toastMessage.append("Restaurant created successfully");
+                                } else {
+                                    toastMessage.append(taskResult.getValue().getMessage());
+                                    toastMessage.append(". The restaurant was not created correctly");
+                                }
+
+                                Toast
+                                    .makeText(CreateRestaurant.this, toastMessage.toString(), Toast.LENGTH_LONG)
+                                    .show();
+
+                                return taskCompletionSource.getTask();
+                            }
+                        });
                 }
             }
         });

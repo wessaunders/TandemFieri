@@ -19,8 +19,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Restaurants repository defines the database logic to use when adding, removing, or updating a Restaurant
@@ -30,70 +33,42 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
     private DatabaseReference dataContext;
 
     /**
-     * add a single restaurant to the database
-     * @param entity indicates the restaurant to add
-     * @param childNodes indicates the variable number of string arguments that identify the
-     *                         child nodes that identify the location of the desired data
-     * ex: restaurants.add(newRestaurant) or restaurants.add(newRestaurant, new String[] {"Downtown"}
+     * addThen adds a new restaurant and then returns the value as a task so that some other action
+     * can be taken
+     * @param entity indicates the entity to add
+     * @return Task containing the results of the find that can be chained to other tasks
      */
-    @Override
-    public void add(Restaurant entity, String... childNodes) {
-        dataContext = getDataContext(entity.getClass().getSimpleName(), childNodes);
-        dataContext.child(entity.getKey().toString()).setValue(entity);
-    }
+    public Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>> add(Restaurant entity) {
+        final Restaurant entityReference = entity;
 
-    /**
-     * add multiple restaurants to the database
-     * @param entities indicates a list of restaurants to add
-     * @param childNodes indicates the variable number of string arguments that identify the
-     *                         child nodes that identify the location of the desired data
-     */
-    @Override
-    public void add(ArrayList<Restaurant> entities, String... childNodes) {
-        dataContext = getDataContext(entities.get(0).getClass().getSimpleName(), childNodes);
-        for (Restaurant entity : entities) {
-            dataContext.child(entity.getKey().toString()).setValue(entity);
-        }
-    }
+        return Tasks.<Void>forResult(null)
+                .continueWithTask(new Continuation<Void, Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>>>() {
+                    @Override
+                    public Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>> then(@NonNull Task<Void> task) throws Exception {
+                        final TaskCompletionSource<AbstractMap.SimpleEntry<Boolean, DatabaseError>> taskCompletionSource = new TaskCompletionSource<>();
 
-    /**
-     * updates the specified restaurant
-     * @param entity indicates the restaurant to update with the new values
-     * @param childNodes indicates the variable number of string arguments that identify the
-     *                         child nodes that identify the location of the desired data
-     * ex: restaurants.update(existingRestaurant) or restaurants.update(existingRestaurant, new String[] {"Fastfood"}
-     */
-    @Override
-    public void update(Restaurant entity, String... childNodes) {
-        dataContext = getDataContext(entity.getClass().getSimpleName(), childNodes);
-        dataContext.child(entity.getKey().toString()).setValue(entity);
-    }
+                        dataContext = getDataContext(entityReference.getClass().getSimpleName(), new String[]{});
+                        dataContext.child(entityReference.getKey().toString()).setValue(entityReference);
 
-    /**
-     * remove a single restaurant from the database
-     * @param entity indicates the restaurant to remove
-     * @param childNodes indicates the variable number of string arguments that identify the
-     *                         child nodes that identify the location of the desired data
-     * ex: restaurants.remove(existingRestaurant) or restaurants.remove(existingRestaurant, new String[] {"Buffet"}
-     */
-    @Override
-    public void remove(Restaurant entity, String... childNodes) {
-        dataContext = getDataContext(entity.getClass().getSimpleName(), childNodes);
-        dataContext.child(entity.getKey().toString()).removeValue();
-    }
+                        dataContext.addListenerForSingleValueEvent(new ValueEventListener() {
+                            AbstractMap.SimpleEntry<Boolean, DatabaseError> listenerResult;
 
-    /**
-     * remove multiple restaurants from the database
-     * @param entities indicates a list of restaurants to remove
-     * @param childNodes indicates the variable number of string arguments that identify the
-     *                         child nodes that identify the location of the desired data
-     */
-    @Override
-    public void remove(ArrayList<Restaurant> entities, String... childNodes) {
-        dataContext = getDataContext(entities.get(0).getClass().getSimpleName(), childNodes);
-        for (Restaurant entity : entities) {
-            dataContext.child(entity.getKey().toString()).removeValue();
-        }
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                listenerResult = new AbstractMap.SimpleEntry(true, null);
+                                taskCompletionSource.setResult(listenerResult);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                listenerResult = new AbstractMap.SimpleEntry(false, databaseError);
+                                taskCompletionSource.setResult(listenerResult);
+                            }
+                        });
+
+                        return taskCompletionSource.getTask();
+                    }
+                });
     }
 
     /**

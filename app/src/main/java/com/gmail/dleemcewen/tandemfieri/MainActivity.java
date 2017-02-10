@@ -71,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
                                     .makeText(getApplicationContext(), task.getResult().getUser().getEmail() +" was successfully signed in", Toast.LENGTH_LONG)
                                     .show();
 
-                            //TODO:  this needs to be moved it is just here for testing
+                            //TODO:  this needs to be moved to the restaurant owner main menu when that is ready
+                            // right now it is just here for testing the CreateRestaurant activity
                             Intent intent = new Intent(MainActivity.this, CreateRestaurant.class);
                             intent.putExtra("ownerId", task.getResult().getUser().getUid());
                             startActivity(intent);
