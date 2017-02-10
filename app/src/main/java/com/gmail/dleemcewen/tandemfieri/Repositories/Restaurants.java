@@ -21,9 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Restaurants repository defines the database logic to use when adding, removing, or updating a Restaurant
@@ -33,7 +31,7 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
     private DatabaseReference dataContext;
 
     /**
-     * addThen adds a new restaurant and then returns the value as a task so that some other action
+     * add adds a new restaurant and then returns the value as a task so that some other action
      * can be taken
      * @param entity indicates the entity to add
      * @return Task containing the results of the find that can be chained to other tasks
