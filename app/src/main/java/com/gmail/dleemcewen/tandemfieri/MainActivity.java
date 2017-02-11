@@ -11,11 +11,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authenticatorListener;
+    private DatabaseReference dBase;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
 
+        dBase = FirebaseDatabase.getInstance().getReference().child("User");
+
+        user = new User();
         mAuth = FirebaseAuth.getInstance();
         authenticatorListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -63,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -75,16 +87,72 @@ public class MainActivity extends AppCompatActivity {
                             // right now it is just here for testing the CreateRestaurant activity
                             Intent intent = new Intent(MainActivity.this, CreateRestaurant.class);
                             intent.putExtra("ownerId", task.getResult().getUser().getUid());
-                            startActivity(intent);
+                            dBase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    navigateToMenu(dataSnapshot);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
+                            //Toast.makeText(getApplicationContext(),"Does this work" + user.getEmail(),Toast.LENGTH_LONG).show();
+                            // No Diner Activity?
+                            /*
+                            Intent diner = new Intent(MainActivity.this, DinerActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("User", user);
+                            diner.putExtras(bundle);
+                            startActivity(diner);
+                            */
                         } else {
                             Toast
                                     .makeText(getApplicationContext(), "Sign in was not successful", Toast.LENGTH_LONG)
                                     .show();
-                        }
-                    }
-                });
-            }
-        });
+                        }//end if task.successful
+                    }//end onComplete
+                });//end sign in
+
+
+            }//end on click
+        });//end sign in button
+    }//end onCreate
+
+    public void navigateToMenu(DataSnapshot dataSnapshot) {
+        // user = dataSnapshot.child("Diner").child(mAuth.getCurrentUser().getUid()).getValue(User.class);
+        //Toast.makeText(getApplicationContext(),"Does this work " + user.getFirstName(),Toast.LENGTH_LONG).show();
+
+        Bundle bundle = new Bundle();
+
+        User diner = dataSnapshot.child("Diner").child(mAuth.getCurrentUser().getUid()).getValue(User.class);
+        User driver = dataSnapshot.child("Driver").child(mAuth.getCurrentUser().getUid()).getValue(User.class);
+        User restaurantOwner = dataSnapshot.child("Restaurant").child(mAuth.getCurrentUser().getUid()).getValue(User.class);
+
+        Intent intent = null;
+
+        if(diner != null){
+            intent = new Intent(MainActivity.this, DinerMainMenu.class);
+            bundle.putSerializable("User", diner);
+        }else if(driver != null){
+            intent = new Intent(MainActivity.this, DriverMainMenu.class);
+            bundle.putSerializable("User", driver);
+        }else if(restaurantOwner != null){
+            intent = new Intent(MainActivity.this, RestaurantMainMenu.class);
+            bundle.putSerializable("User", restaurantOwner);
+        }
+
+        intent.putExtras(bundle);
+        startActivity(intent);
+
+    }
+
+    private void clear(){
+        email.setText("");
+        password.setText("");
     }
 
     @Override
@@ -95,7 +163,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        super.onStop();
         mAuth.removeAuthStateListener(authenticatorListener);
+        super.onStop();
     }
-}
+
+    @Override
+    protected void onPause(){
+        mAuth.removeAuthStateListener(authenticatorListener);
+        clear();
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        mAuth.addAuthStateListener(authenticatorListener);
+    }
+}//end activity
