@@ -24,13 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 public class ManageRestaurants extends AppCompatActivity {
-    TextView header;
-    Button addRestaurant;
-    ExpandableListView restaurantsList;
-    ExpandableListAdapter listAdapter;
-    Restaurants<Restaurant> restaurants;
-    User currentUser;
-    Context context;
+    private TextView header;
+    private Button addRestaurant;
+    private ExpandableListView restaurantsList;
+    private ExpandableListAdapter listAdapter;
+    private Restaurants<Restaurant> restaurants;
+    private User currentUser;
+    private Context context;
+    private static final int CREATE_RESTAURANT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,14 @@ public class ManageRestaurants extends AppCompatActivity {
         bindEventHandlers();
         retrieveData();
         finalizeLayout();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CREATE_RESTAURANT && resultCode == RESULT_OK) {
+            //A new restaurant was added, so reload the restaurants data
+            retrieveData();
+        }
     }
 
     /**
@@ -72,8 +81,8 @@ public class ManageRestaurants extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ManageRestaurants.this, CreateRestaurant.class);
-                intent.putExtra("ownerId", currentUser.getKey());
-                startActivity(intent);
+                intent.putExtra("ownerId", currentUser.getAuthUserID());
+                startActivityForResult(intent, CREATE_RESTAURANT);
             }
         });
     }
@@ -100,10 +109,10 @@ public class ManageRestaurants extends AppCompatActivity {
      * @param entities indicates a list of restaurants returned by the retrieveData method
      * @return Map of the expandable child data
      */
-    private Map<String, List<String>> buildExpandableChildData(List<Restaurant> entities) {
-        HashMap<String, List<String>> childData = new HashMap<>();
+    private Map<String, List<Restaurant>> buildExpandableChildData(List<Restaurant> entities) {
+        HashMap<String, List<Restaurant>> childData = new HashMap<>();
         for (Restaurant entity : entities) {
-            childData.put(entity.getKey(), Arrays.asList(entity.getKey()));
+            childData.put(entity.getKey(), Arrays.asList(entity));
         }
 
         return childData;

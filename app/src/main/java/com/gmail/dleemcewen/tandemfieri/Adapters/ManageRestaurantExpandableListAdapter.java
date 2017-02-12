@@ -1,7 +1,10 @@
 package com.gmail.dleemcewen.tandemfieri.Adapters;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +16,9 @@ import android.widget.Toast;
 
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.R;
+import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +30,17 @@ import java.util.Map;
 public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAdapter {
     private Activity context;
     private List<Restaurant> restaurantsList;
-    private Map<String, List<String>> childDataList;
+    private Map<String, List<Restaurant>> childDataList;
+    private Resources resources;
+    private Restaurants<Restaurant> restaurantsRepository;
 
     public ManageRestaurantExpandableListAdapter(Activity context, List<Restaurant> restaurantsList,
-                                                 Map<String, List<String>> childDataList) {
+                                                 Map<String, List<Restaurant>> childDataList) {
         this.context = context;
         this.restaurantsList = restaurantsList;
         this.childDataList = childDataList;
+        resources = context.getResources();
+        restaurantsRepository = new Restaurants<>();
     }
 
     /**
@@ -155,12 +164,40 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
         removeRestaurant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Removing restaurant " + restaurant.getName(), Toast.LENGTH_SHORT).show();
+                StringBuilder dialogMessageBuilder = new StringBuilder();
+                dialogMessageBuilder.append(resources.getString(R.string.removeConfirmationQuestion));
+                dialogMessageBuilder.append(" ");
+                dialogMessageBuilder.append(restaurant.getName());
+                dialogMessageBuilder.append("?");
 
-                //TODO: confirm with user
-                // if confirmed, remove restaurant from database
+                AlertDialog.Builder removalConfirmationDialog  = new AlertDialog.Builder(context);
+                removalConfirmationDialog
+                    .setMessage(dialogMessageBuilder.toString());
+                removalConfirmationDialog
+                    .setTitle(resources.getString(R.string.manageRestaurantsActivityTitle));
+                removalConfirmationDialog.setCancelable(false);
+                removalConfirmationDialog.setPositiveButton(
+                        resources.getString(R.string.yes),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                restaurantsList.remove(restaurant);
+                                childDataList.remove(Arrays.asList(restaurant));
+                                restaurantsRepository.remove(restaurant);
+                                notifyDataSetChanged();
 
-                //restaurantsList.remove(restaurant);
+                                dialog.cancel();
+                            }
+                        });
+                removalConfirmationDialog.setNegativeButton(
+                        resources.getString(R.string.no),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                removalConfirmationDialog
+                        .create()
+                        .show();
             }
         });
 
@@ -187,7 +224,7 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
      */
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final String childText = (String) getChild(groupPosition, childPosition);
+        final Restaurant selectedChild = (Restaurant) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -198,6 +235,31 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
         Button manageMenuItems = (Button)convertView.findViewById(R.id.manageMenuItems);
         Button viewSales = (Button)convertView.findViewById(R.id.viewSales);
         Button rateDrivers = (Button)convertView.findViewById(R.id.rateDrivers);
+
+        manageMenuItems.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast
+                    .makeText(context, "Managing menu items for " + selectedChild.getName(), Toast.LENGTH_SHORT)
+                    .show();
+            }
+        });
+        viewSales.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast
+                    .makeText(context, "Viewing sales for " + selectedChild.getName(), Toast.LENGTH_SHORT)
+                    .show();
+            }
+        });
+        rateDrivers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast
+                    .makeText(context, "Rating drivers for " + selectedChild.getName(), Toast.LENGTH_SHORT)
+                    .show();
+            }
+        });
 
         return convertView;
     }
