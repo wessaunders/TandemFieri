@@ -94,7 +94,7 @@ public class ManageRestaurants extends AppCompatActivity {
         //find all the restaurants where the ownerid matches the current user id
         restaurants.find(
             Arrays.asList("ownerId"),
-            currentUser.getAuthUserID(),
+            Arrays.asList(currentUser.getAuthUserID()),
             new QueryCompleteListener<Restaurant>() {
                 @Override
                 public void onQueryComplete(ArrayList<Restaurant> entities) {

@@ -73,7 +73,7 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
      * find restaurants from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param value indicates the data value to search for
+     * @param values indicates the data values to search for
      * @param onQueryComplete identifies the QueryCompleteListener to push results back to
      * ex: to find a restaurant downtown on Broadway:
     users.find(Arrays.asList("Downtown", "Street"), "Broadway", new QueryCompleteListener<User>() {
@@ -84,8 +84,8 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
     });
      */
     @Override
-    public void find(List<String> childNodes, String value, QueryCompleteListener<Restaurant> onQueryComplete) {
-        search(childNodes, value, onQueryComplete);
+    public void find(List<String> childNodes, List<String> values, QueryCompleteListener<Restaurant> onQueryComplete) {
+        search(childNodes, values.get(0), onQueryComplete);
     }
 
     /**
@@ -130,7 +130,10 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
                 .getInstance()
                 .getReference(Restaurant.class.getSimpleName());
 
-        Query query = buildQuery(dataContext, childNodes, value);
+        String[] childNodesArray = new String[childNodes.size()];
+        childNodesArray = childNodes.toArray(childNodesArray);
+
+        Query query = buildEqualsQuery(dataContext, value, childNodesArray);
         final QueryCompleteListener<Restaurant> finalQueryCompleteListener = onQueryComplete;
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
