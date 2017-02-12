@@ -19,6 +19,9 @@ import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ManageRestaurants extends AppCompatActivity {
     TextView header;
@@ -69,7 +72,8 @@ public class ManageRestaurants extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ManageRestaurants.this, CreateRestaurant.class);
-                intent.putExtra("ownerId", currentUser.getAuthUserID());
+                intent.putExtra("ownerId", currentUser.getKey());
+                startActivity(intent);
             }
         });
     }
@@ -85,10 +89,24 @@ public class ManageRestaurants extends AppCompatActivity {
             new QueryCompleteListener<Restaurant>() {
                 @Override
                 public void onQueryComplete(ArrayList<Restaurant> entities) {
-                    listAdapter = new ManageRestaurantExpandableListAdapter((Activity)context, entities);
+                    listAdapter = new ManageRestaurantExpandableListAdapter((Activity)context, entities, buildExpandableChildData(entities));
                     restaurantsList.setAdapter(listAdapter);
                 }
         });
+    }
+
+    /**
+     * buildExpandableChildData builds the data that is associated with the expandable child entries
+     * @param entities indicates a list of restaurants returned by the retrieveData method
+     * @return Map of the expandable child data
+     */
+    private Map<String, List<String>> buildExpandableChildData(List<Restaurant> entities) {
+        HashMap<String, List<String>> childData = new HashMap<>();
+        for (Restaurant entity : entities) {
+            childData.put(entity.getKey(), Arrays.asList(entity.getKey()));
+        }
+
+        return childData;
     }
 
     /**

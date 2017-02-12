@@ -9,11 +9,13 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.R;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ManageRestaurantExpandableListAdapter provides the required methods to render the expandable
@@ -23,10 +25,13 @@ import java.util.List;
 public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAdapter {
     private Activity context;
     private List<Restaurant> restaurantsList;
+    private Map<String, List<String>> childDataList;
 
-    public ManageRestaurantExpandableListAdapter(Activity context, List<Restaurant> restaurantsList) {
+    public ManageRestaurantExpandableListAdapter(Activity context, List<Restaurant> restaurantsList,
+                                                 Map<String, List<String>> childDataList) {
         this.context = context;
         this.restaurantsList = restaurantsList;
+        this.childDataList = childDataList;
     }
 
     /**
@@ -47,7 +52,7 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
      */
     @Override
     public int getChildrenCount(int groupPosition) {
-        return 0;
+        return childDataList.get(restaurantsList.get(groupPosition).getKey()).size();
     }
 
     /**
@@ -71,7 +76,7 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
      */
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return childPosition;
+        return childDataList.get(restaurantsList.get(groupPosition).getKey()).get(childPosition);
     }
 
     /**
@@ -101,7 +106,7 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
      */
     @Override
     public long getChildId(int groupPosition, int childPosition) {
-        return 0;
+        return childPosition;
     }
 
     /**
@@ -150,10 +155,12 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
         removeRestaurant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(context, "Removing restaurant " + restaurant.getName(), Toast.LENGTH_SHORT).show();
+
                 //TODO: confirm with user
                 // if confirmed, remove restaurant from database
 
-                restaurantsList.remove(restaurant);
+                //restaurantsList.remove(restaurant);
             }
         });
 
@@ -187,6 +194,7 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
             convertView = layoutInflater.inflate(R.layout.manage_restaurants_list_item, null);
         }
 
+        //TODO: add click events for buttons
         Button manageMenuItems = (Button)convertView.findViewById(R.id.manageMenuItems);
         Button viewSales = (Button)convertView.findViewById(R.id.viewSales);
         Button rateDrivers = (Button)convertView.findViewById(R.id.rateDrivers);
@@ -203,6 +211,6 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
      */
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
     }
 }

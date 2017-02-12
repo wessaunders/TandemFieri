@@ -1,6 +1,7 @@
 package com.gmail.dleemcewen.tandemfieri;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -33,11 +34,17 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener authenticatorListener;
     private DatabaseReference dBase;
     private User user;
+    private Resources resources;
+
+    private boolean verifiedEmailNotRequiredForLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        resources = getResources();
+        verifiedEmailNotRequiredForLogin = resources.getBoolean(R.bool.verified_email_not_required_for_login);
 
         createAccount = (TextView) findViewById(R.id.createAccount);
         signInButton = (Button) findViewById(R.id.signInButton);
@@ -79,39 +86,28 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast
-                                    .makeText(getApplicationContext(), task.getResult().getUser().getEmail() +" was successfully signed in", Toast.LENGTH_LONG)
-                                    .show();
+                            if (verifiedEmailNotRequiredForLogin || task.getResult().getUser().isEmailVerified()) {
+                                Toast.makeText(getApplicationContext(), task.getResult().getUser().getEmail() + " was successfully signed in", Toast.LENGTH_LONG)
+                                        .show();
 
-                            //TODO:  this needs to be moved to the restaurant owner main menu when that is ready
-                            // right now it is just here for testing the CreateRestaurant activity
-                            Intent intent = new Intent(MainActivity.this, CreateRestaurant.class);
-                            intent.putExtra("ownerId", task.getResult().getUser().getUid());
-                            dBase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    navigateToMenu(dataSnapshot);
-                                }
+                                dBase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        navigateToMenu(dataSnapshot);
+                                    }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
-
-
-                            //Toast.makeText(getApplicationContext(),"Does this work" + user.getEmail(),Toast.LENGTH_LONG).show();
-                            // No Diner Activity?
-                            /*
-                            Intent diner = new Intent(MainActivity.this, DinerActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("User", user);
-                            diner.putExtras(bundle);
-                            startActivity(diner);
-                            */
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(getApplicationContext(), "That user is not verified, check email for verification link.", Toast.LENGTH_LONG)
+                                        .show();
+                            }
                         } else {
                             Toast
-                                    .makeText(getApplicationContext(), "Sign in was not successful", Toast.LENGTH_LONG)
+                                    .makeText(getApplicationContext(), "Sign in was not successful. Check login details please.", Toast.LENGTH_LONG)
                                     .show();
                         }//end if task.successful
                     }//end onComplete
