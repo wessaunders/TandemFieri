@@ -92,13 +92,13 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
      * find restaurants from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param value indicates the data value to search for
+     * @param values indicates the data values to search for
      * @return Task containing the results of the find that can be chained to other tasks
      */
     @Override
-    public Task<ArrayList<Restaurant>> find(List<String> childNodes, String value) {
+    public Task<ArrayList<Restaurant>> find(List<String> childNodes, List<String> values) {
         final List<String> childNodesReference = childNodes;
-        final String valueReference = value;
+        final List<String> valuesReference = values;
 
         return Tasks.<Void>forResult(null)
                 .continueWithTask(new Continuation<Void, Task<ArrayList<Restaurant>>>() {
@@ -106,7 +106,7 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
                     public Task<ArrayList<Restaurant>> then(@NonNull Task<Void> task) throws Exception {
                         final TaskCompletionSource<ArrayList<Restaurant>> taskCompletionSource = new TaskCompletionSource<ArrayList<Restaurant>>();
 
-                        search(childNodesReference, valueReference, new QueryCompleteListener<Restaurant>() {
+                        search(childNodesReference, valuesReference.get(0), new QueryCompleteListener<Restaurant>() {
                             @Override
                             public void onQueryComplete(ArrayList<Restaurant> entities) {
                                 taskCompletionSource.setResult(entities);

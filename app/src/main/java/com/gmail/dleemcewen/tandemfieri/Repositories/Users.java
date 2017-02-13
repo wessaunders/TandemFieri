@@ -52,13 +52,13 @@ public class Users<T extends Entity> extends Repository<User> {
      * find users from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param value indicates the data value to search for
+     * @param values indicates the data values to search for
      * @return Task containing the results of the find that can be chained to other tasks
      */
     @Override
-    public Task<ArrayList<User>> find(List<String> childNodes, String value) {
+    public Task<ArrayList<User>> find(List<String> childNodes, List<String> values) {
         final List<String> childNodesReference = childNodes;
-        final String valueReference = value;
+        final List<String> valuesReference = values;
 
         return Tasks.<Void>forResult(null)
                 .continueWithTask(new Continuation<Void, Task<ArrayList<User>>>() {
@@ -66,7 +66,7 @@ public class Users<T extends Entity> extends Repository<User> {
                     public Task<ArrayList<User>> then(@NonNull Task<Void> task) throws Exception {
                         final TaskCompletionSource<ArrayList<User>> taskCompletionSource = new TaskCompletionSource<ArrayList<User>>();
 
-                        search(childNodesReference, valueReference, new QueryCompleteListener<User>() {
+                        search(childNodesReference, valuesReference.get(0), new QueryCompleteListener<User>() {
                             @Override
                             public void onQueryComplete(ArrayList<User> entities) {
                                 taskCompletionSource.setResult(entities);

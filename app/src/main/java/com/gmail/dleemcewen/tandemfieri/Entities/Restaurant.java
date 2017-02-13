@@ -2,12 +2,13 @@ package com.gmail.dleemcewen.tandemfieri.Entities;
 
 import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Restaurant defines all the properties and behaviors for a Restaurant entity
  */
-public class Restaurant extends Entity {
+public class Restaurant extends Entity implements Serializable {
     private String name;
     private String street;
     private String city;
