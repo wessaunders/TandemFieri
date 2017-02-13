@@ -73,7 +73,7 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
      * find restaurants from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param values indicates the data values to search for
+     * @param value indicates the data value to search for
      * @param onQueryComplete identifies the QueryCompleteListener to push results back to
      * ex: to find a restaurant downtown on Broadway:
     users.find(Arrays.asList("Downtown", "Street"), "Broadway", new QueryCompleteListener<User>() {
@@ -84,21 +84,21 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
     });
      */
     @Override
-    public void find(List<String> childNodes, List<String> values, QueryCompleteListener<Restaurant> onQueryComplete) {
-        search(childNodes, values.get(0), onQueryComplete);
+    public void find(List<String> childNodes, String value, QueryCompleteListener<Restaurant> onQueryComplete) {
+        search(childNodes, value, onQueryComplete);
     }
 
     /**
      * find restaurants from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param values indicates the data values to search for
+     * @param value indicates the data value to search for
      * @return Task containing the results of the find that can be chained to other tasks
      */
     @Override
-    public Task<ArrayList<Restaurant>> find(List<String> childNodes, List<String> values) {
+    public Task<ArrayList<Restaurant>> find(List<String> childNodes, String value) {
         final List<String> childNodesReference = childNodes;
-        final List<String> valuesReference = values;
+        final String valueReference = value;
 
         return Tasks.<Void>forResult(null)
                 .continueWithTask(new Continuation<Void, Task<ArrayList<Restaurant>>>() {
@@ -106,7 +106,7 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
                     public Task<ArrayList<Restaurant>> then(@NonNull Task<Void> task) throws Exception {
                         final TaskCompletionSource<ArrayList<Restaurant>> taskCompletionSource = new TaskCompletionSource<ArrayList<Restaurant>>();
 
-                        search(childNodesReference, valuesReference.get(0), new QueryCompleteListener<Restaurant>() {
+                        search(childNodesReference, valueReference, new QueryCompleteListener<Restaurant>() {
                             @Override
                             public void onQueryComplete(ArrayList<Restaurant> entities) {
                                 taskCompletionSource.setResult(entities);
@@ -158,5 +158,4 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
             }
         });
     }
-
 }

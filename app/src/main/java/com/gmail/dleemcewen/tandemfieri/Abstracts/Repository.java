@@ -81,19 +81,19 @@ public abstract class Repository<T extends Entity> {
      * find entities from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param values indicates the data values to search for
+     * @param value indicates the data value to search for
      * @param onQueryComplete identifies the QueryCompleteListener to push results back to
      */
-    public abstract void find(List<String> childNodes, List<String> values, QueryCompleteListener<T> onQueryComplete);
+    public abstract void find(List<String> childNodes, String value, QueryCompleteListener<T> onQueryComplete);
 
     /**
      * find entities from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param values indicates the data values to search for
+     * @param value indicates the data value to search for
      * @return Task containing the results of the find that can be chained to other tasks
      */
-    public abstract Task<ArrayList<T>> find(List<String> childNodes, List<String> values);
+    public abstract Task<ArrayList<T>> find(List<String> childNodes, String value);
 
     /**
      * getDataContext gets a new data context pointing to the appropriate entity

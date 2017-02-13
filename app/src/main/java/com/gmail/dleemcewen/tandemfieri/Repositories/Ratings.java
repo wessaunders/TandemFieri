@@ -37,8 +37,23 @@ public class Ratings<T extends Entity> extends Repository<Rating> {
      * @param values          indicates the values to search for
      * @param onQueryComplete identifies the QueryCompleteListener to push results back to
      */
-    @Override
     public void find(List<String> childNodes, List<String> values, QueryCompleteListener<Rating> onQueryComplete) {
+        search(childNodes, values, onQueryComplete);
+    }
+
+    /**
+     * find entities from the database
+     *
+     * @param childNodes      identifies the list of string arguments that indicates the
+     *                        child node(s) that identify the location of the desired data
+     * @param value           indicates the value to search for
+     * @param onQueryComplete identifies the QueryCompleteListener to push results back to
+     */
+    @Override
+    public void find(List<String> childNodes, String value, QueryCompleteListener<Rating> onQueryComplete) {
+        List<String> values = new ArrayList<>();
+        values.add(value);
+
         search(childNodes, values, onQueryComplete);
     }
 
@@ -47,13 +62,14 @@ public class Ratings<T extends Entity> extends Repository<Rating> {
      *
      * @param childNodes identifies the list of string arguments that indicates the
      *                   child node(s) that identify the location of the desired data
-     * @param values      indicates the data values to search for
+     * @param value      indicates the data value to search for
      * @return Task containing the results of the find that can be chained to other tasks
      */
     @Override
-    public Task<ArrayList<Rating>> find(List<String> childNodes, List<String> values) {
+    public Task<ArrayList<Rating>> find(List<String> childNodes, String value) {
         final List<String> childNodesReference = childNodes;
-        final List<String> valuesReference = values;
+        final List<String> valuesReference = new ArrayList<>();
+        valuesReference.add(value);
 
         return Tasks.<Void>forResult(null)
                 .continueWithTask(new Continuation<Void, Task<ArrayList<Rating>>>() {

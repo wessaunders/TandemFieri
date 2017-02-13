@@ -33,32 +33,32 @@ public class Users<T extends Entity> extends Repository<User> {
      * find users from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param values indicates the data values to search for
+     * @param value indicates the data value to search for
      * @param onQueryComplete identifies the QueryCompleteListener to push results back to
      * ex: to find a user driver with the first name of "Joe":
-           users.find(Arrays.asList("Driver"), "Joe", new QueryCompleteListener<User>() {
-                @Override
-                public void onQueryComplete(ArrayList<User> entities) {
-                    // ...
-                }
-           });
+    users.find(Arrays.asList("Driver"), "Joe", new QueryCompleteListener<User>() {
+    @Override
+    public void onQueryComplete(ArrayList<User> entities) {
+    // ...
+    }
+    });
      */
     @Override
-    public void find(List<String> childNodes, List<String> values, QueryCompleteListener<User> onQueryComplete) {
-        search(childNodes, values.get(0), onQueryComplete);
+    public void find(List<String> childNodes, String value, QueryCompleteListener<User> onQueryComplete) {
+        search(childNodes, value, onQueryComplete);
     }
 
     /**
      * find users from the database
      * @param childNodes identifies the list of string arguments that indicates the
      *                         child node(s) that identify the location of the desired data
-     * @param values indicates the data values to search for
+     * @param value indicates the data value to search for
      * @return Task containing the results of the find that can be chained to other tasks
      */
     @Override
-    public Task<ArrayList<User>> find(List<String> childNodes, List<String> values) {
+    public Task<ArrayList<User>> find(List<String> childNodes, String value) {
         final List<String> childNodesReference = childNodes;
-        final List<String> valuesReference = values;
+        final String valueReference = value;
 
         return Tasks.<Void>forResult(null)
                 .continueWithTask(new Continuation<Void, Task<ArrayList<User>>>() {
@@ -66,7 +66,7 @@ public class Users<T extends Entity> extends Repository<User> {
                     public Task<ArrayList<User>> then(@NonNull Task<Void> task) throws Exception {
                         final TaskCompletionSource<ArrayList<User>> taskCompletionSource = new TaskCompletionSource<ArrayList<User>>();
 
-                        search(childNodesReference, valuesReference.get(0), new QueryCompleteListener<User>() {
+                        search(childNodesReference, valueReference, new QueryCompleteListener<User>() {
                             @Override
                             public void onQueryComplete(ArrayList<User> entities) {
                                 taskCompletionSource.setResult(entities);
@@ -119,3 +119,6 @@ public class Users<T extends Entity> extends Repository<User> {
         });
     }
 }
+
+
+

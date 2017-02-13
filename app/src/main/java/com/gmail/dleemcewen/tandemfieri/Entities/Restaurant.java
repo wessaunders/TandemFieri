@@ -4,6 +4,7 @@ import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Restaurant defines all the properties and behaviors for a Restaurant entity
@@ -151,10 +152,18 @@ public class Restaurant extends Entity implements Serializable {
         this.ownerId = ownerId;
     }
 
+    /**
+     * get the drivers associated with the restaurant
+     * @return return all of the drivers associated with the restaurant
+     */
     public List<User> getDrivers() {
         return drivers;
     }
 
+    /**
+     * sets the drivers associated with the restaurant
+     * @param drivers the drivers associated with the restaurant
+     */
     public void setDrivers(List<User> drivers) {
         this.drivers = drivers;
     }

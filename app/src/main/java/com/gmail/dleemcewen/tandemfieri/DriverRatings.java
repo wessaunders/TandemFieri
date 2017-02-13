@@ -168,9 +168,11 @@ public class DriverRatings extends AppCompatActivity {
         //Sort ratingslist by driver in ascending order
         Collections.sort(matchedRatingsList, new RatingsByDriverInAscendingOrderComparator());
 
+        //Ensure the method is working with a distinct list of drivers
         List<AbstractMap.SimpleEntry<String, String>> distinctDrivers =
                 buildDistinctListOfDrivers(restaurant.getDrivers());
 
+        //Calculate each driver's average rating
         for (AbstractMap.SimpleEntry<String, String> driver : distinctDrivers) {
             double averageRating = buildDriverAverageRating(driver.getKey(), matchedRatingsList);
             AbstractMap.SimpleEntry<String, Double> driverRating =
