@@ -53,4 +53,6 @@
     <string name="averageRating">Average rating</string>
     <string name="invalidEndDate">The selected end date cannot occur before the selected start date.</string>
     <string name="driverRatingsActivityTitle">Driver ratings</string>
+    <string name="updateButton">Update</string>
+    <string name="deliveryRadius">Delivery Radius (mi)</string>
 </resources>
