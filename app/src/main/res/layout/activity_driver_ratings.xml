@@ -57,33 +57,19 @@
             android:hint="@string/hintEndDate"
             android:textSize="@dimen/regular_text_size" />
     </LinearLayout>
-    <LinearLayout
-        android:id="@+id/ratingsControlContainer"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/viewDriverRatings"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/endDateContainer">
-        <Switch
-            android:id="@+id/activeInactiveDrivers"
-            android:text="Include inactive drivers"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/button_text_size" />
-        <Button
-            android:id="@+id/viewDriverRatings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:text="@string/rateDriversButton"
-            android:textSize="@dimen/button_text_size"/>
-    </LinearLayout>
+        android:layout_below="@id/endDateContainer"
+        android:layout_alignParentRight="true"
+        android:text="@string/rateDriversButton"
+        android:textSize="@dimen/button_text_size"/>
     <ListView
         android:id="@+id/driverRatingsList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/ratingsControlContainer"
+        android:layout_below="@+id/viewDriverRatings"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 </RelativeLayout>

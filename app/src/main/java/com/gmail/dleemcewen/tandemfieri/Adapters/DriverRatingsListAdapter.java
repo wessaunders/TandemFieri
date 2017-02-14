@@ -11,7 +11,9 @@ import android.widget.TextView;
 import com.gmail.dleemcewen.tandemfieri.R;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DriverRatingsListAdapter provides the required methods to render the
@@ -20,11 +22,16 @@ import java.util.List;
 
 public class DriverRatingsListAdapter extends BaseAdapter {
     private Context context;
-    private List<AbstractMap.SimpleEntry<String, Double>> driverRatingsList;
+    private List<Map.Entry<String, Double>> driverRatingsList;
 
-    public DriverRatingsListAdapter(Context context, List<AbstractMap.SimpleEntry<String, Double>> driverRatingsList) {
+    public DriverRatingsListAdapter(Context context, List<Map.Entry<String, Double>> driverRatingsList) {
         this.context = context;
-        this.driverRatingsList = driverRatingsList;
+
+        if (!driverRatingsList.isEmpty()) {
+            this.driverRatingsList = driverRatingsList;
+        } else {
+            this.driverRatingsList = buildRatingListWithDefaultMessage();
+        }
     }
 
     /**
@@ -80,7 +87,7 @@ public class DriverRatingsListAdapter extends BaseAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final AbstractMap.SimpleEntry<String, Double> driverRating = driverRatingsList.get(position);
+        final Map.Entry<String, Double> driverRating = driverRatingsList.get(position);
 
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
@@ -96,5 +103,20 @@ public class DriverRatingsListAdapter extends BaseAdapter {
         averageRating.setText(driverRating.getValue().toString());
 
         return convertView;
+    }
+
+    /**
+     * buildRatingListWithDefaultMessage builds a rating list with a default message
+     * @return rating list containing default message
+     */
+    private List<Map.Entry<String, Double>> buildRatingListWithDefaultMessage() {
+        AbstractMap.Entry<String, Double> defaultMessageEntry =
+            new AbstractMap.SimpleEntry<String, Double>("No driver ratings to show", 0d);
+
+        List<Map.Entry<String, Double>> ratingListWithDefaultMessage =
+            new ArrayList<Map.Entry<String, Double>>();
+        ratingListWithDefaultMessage.add(defaultMessageEntry);
+
+        return ratingListWithDefaultMessage;
     }
 }

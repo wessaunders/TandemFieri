@@ -258,9 +258,12 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
         rateDrivers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Android assigns a new key to the restaurant when deserializing
+                //so send the existing key along as well so the new key can be replaced
                 Bundle bundle = new Bundle();
                 Intent intent = new Intent(context, DriverRatings.class);
                 bundle.putSerializable("Restaurant", selectedChild);
+                bundle.putString("key", selectedChild.getKey());
                 intent.putExtras(bundle);
                 context.startActivity(intent);
             }

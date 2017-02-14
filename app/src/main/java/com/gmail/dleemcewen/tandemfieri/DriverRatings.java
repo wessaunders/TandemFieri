@@ -1,24 +1,27 @@
 package com.gmail.dleemcewen.tandemfieri;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Switch;
 
 import com.gmail.dleemcewen.tandemfieri.Adapters.DriverRatingsListAdapter;
 import com.gmail.dleemcewen.tandemfieri.Comparators.RatingsByDriverInAscendingOrderComparator;
 import com.gmail.dleemcewen.tandemfieri.Entities.Rating;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
-import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.EventListeners.QueryCompleteListener;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Ratings;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,18 +30,19 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 public class DriverRatings extends AppCompatActivity {
     private EditText startDate;
     private EditText endDate;
-    private Switch activeInactiveDrivers;
     private Button viewDriverRatings;
     private ListView ratingsList;
     private Ratings<Rating> ratingsRepository;
     private Restaurant restaurant;
     private Calendar calendar;
-    private boolean includeInactiveDrivers = false;
+    private Resources resources;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +58,7 @@ public class DriverRatings extends AppCompatActivity {
      * initialize all necessary variables
      */
     private void initialize() {
+        resources = this.getResources();
         ratingsRepository = new Ratings<>();
         calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -61,6 +66,7 @@ public class DriverRatings extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle = this.getIntent().getExtras();
         restaurant = (Restaurant)bundle.getSerializable("Restaurant");
+        restaurant.setKey(bundle.getString("key"));
     }
 
     /**
@@ -69,7 +75,6 @@ public class DriverRatings extends AppCompatActivity {
     private void findControlReferences() {
         startDate = (EditText)findViewById(R.id.startDate);
         endDate = (EditText)findViewById(R.id.endDate);
-        activeInactiveDrivers = (Switch)findViewById(R.id.activeInactiveDrivers);
         viewDriverRatings = (Button)findViewById(R.id.viewDriverRatings);
         ratingsList = (ListView)findViewById(R.id.driverRatingsList);
     }
@@ -102,8 +107,33 @@ public class DriverRatings extends AppCompatActivity {
                 DatePickerDialog dialog = new DatePickerDialog(DriverRatings.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        endDate.setText(
-                                String.valueOf(month + 1) + "/" + String.valueOf(dayOfMonth) + "/" + String.valueOf(year));
+                        String formattedEndDate = String.valueOf(month + 1) + "/" + String.valueOf(dayOfMonth) + "/" + String.valueOf(year);
+                        if (isEndDateAfterStartDate(startDate.getText().toString(), formattedEndDate)) {
+                            endDate.setText(
+                                    String.valueOf(month + 1) + "/" + String.valueOf(dayOfMonth) + "/" + String.valueOf(year));
+                        } else {
+                            AlertDialog.Builder invalidDateDialog  = new AlertDialog.Builder(DriverRatings.this);
+                            invalidDateDialog
+                                    .setMessage(resources.getString(R.string.invalidEndDate));
+                            invalidDateDialog
+                                    .setTitle(resources.getString(R.string.driverRatingsActivityTitle));
+                            invalidDateDialog.setCancelable(false);
+                            invalidDateDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                            invalidDateDialog.setNegativeButton(R.string.cancel,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                            invalidDateDialog
+                                    .create()
+                                    .show();
+                        }
                     }
                 },
                 calendar.get(Calendar.YEAR),
@@ -111,13 +141,6 @@ public class DriverRatings extends AppCompatActivity {
                 calendar.get(Calendar.DAY_OF_MONTH));
 
                 dialog.show();
-            }
-        });
-
-        activeInactiveDrivers.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                includeInactiveDrivers = isChecked;
             }
         });
 
@@ -141,6 +164,7 @@ public class DriverRatings extends AppCompatActivity {
                 @Override
                 public void onQueryComplete(ArrayList<Rating> entities) {
                     matchedRatingsList.addAll(entities);
+                    buildRatings(matchedRatingsList);
                 }
             });
         } else {
@@ -158,25 +182,34 @@ public class DriverRatings extends AppCompatActivity {
                                 matchedRatingsList.add(rating);
                             }
                         }
+
+                        buildRatings(matchedRatingsList);
                     }
             });
         }
+    }
 
+    /**
+     * buildRatings builds the ratings for the matched ratings
+     * @param matchedRatingsList indicates the list of matched ratings
+     */
+    private void buildRatings(List<Rating> matchedRatingsList) {
         //arraylist to store driver and average rating
-        ArrayList<AbstractMap.SimpleEntry<String, Double>> driverRatingsList = new ArrayList<>();
+        ArrayList<Map.Entry<String, Double>> driverRatingsList = new ArrayList<>();
 
         //Sort ratingslist by driver in ascending order
         Collections.sort(matchedRatingsList, new RatingsByDriverInAscendingOrderComparator());
 
         //Ensure the method is working with a distinct list of drivers
-        List<AbstractMap.SimpleEntry<String, String>> distinctDrivers =
-                buildDistinctListOfDrivers(restaurant.getDrivers());
+        //matching to the drivers in the matched ratings list
+        List<Map.Entry<String, String>> distinctDrivers =
+                buildDistinctListOfDrivers(restaurant.getDrivers(), matchedRatingsList);
 
         //Calculate each driver's average rating
-        for (AbstractMap.SimpleEntry<String, String> driver : distinctDrivers) {
+        for (Map.Entry<String, String> driver : distinctDrivers) {
             double averageRating = buildDriverAverageRating(driver.getKey(), matchedRatingsList);
-            AbstractMap.SimpleEntry<String, Double> driverRating =
-                new AbstractMap.SimpleEntry<>(driver.getValue(), averageRating);
+            Map.Entry<String, Double> driverRating =
+                    new AbstractMap.SimpleEntry<>(driver.getValue(), averageRating);
             driverRatingsList.add(driverRating);
         }
 
@@ -189,21 +222,17 @@ public class DriverRatings extends AppCompatActivity {
      * @param drivers indicates the drivers associated with the current restaurant
      * @return a distinct list of the driver ids and names
      */
-    private List<AbstractMap.SimpleEntry<String, String>> buildDistinctListOfDrivers(List<User> drivers) {
-        List<AbstractMap.SimpleEntry<String, String>> distinctListOfDrivers = new ArrayList<>();
+    private List<Map.Entry<String, String>> buildDistinctListOfDrivers(
+            Map<String, String> drivers, List<Rating> matchedRatingsList) {
+        List<Map.Entry<String, String>> distinctListOfDrivers = new ArrayList<>();
 
         if (drivers != null && !drivers.isEmpty()) {
-            Set<String> distinctDriverIds =  buildDistinctListOfDriverIds();
+            Set<String> distinctDriverIds =  buildDistinctListOfDriverIds(matchedRatingsList);
             for (String driverId : distinctDriverIds) {
-                AbstractMap.SimpleEntry<String, String> distinctDriver = null;
-                for (User driver : drivers) {
-                    if (distinctDriver == null && driver.getAuthUserID().equals(driverId)) {
-                        StringBuilder driverNameBuilder = new StringBuilder();
-                        driverNameBuilder.append(driver.getFirstName());
-                        driverNameBuilder.append(" ");
-                        driverNameBuilder.append(driver.getLastName());
-
-                        distinctDriver = new AbstractMap.SimpleEntry<>(driverId, driverNameBuilder.toString());
+                Map.Entry<String, String> distinctDriver = null;
+                for (Map.Entry<String, String> driver : drivers.entrySet()) {
+                    if (distinctDriver == null && driver.getKey().equals(driverId)) {
+                        distinctDriver = new AbstractMap.SimpleEntry<>(driverId, driver.getValue());
                     }
                 }
 
@@ -216,15 +245,19 @@ public class DriverRatings extends AppCompatActivity {
 
     /**
      * buildDistinctListOfDriverIds returns a list of distinct driver ids
+     * that are also in the matched ratings list
      * @return list of distinct driver ids
      */
-    private Set<String> buildDistinctListOfDriverIds() {
-        Set<String> distinctDriverIds = new HashSet<String>();
-        for (User driver : restaurant.getDrivers()) {
-            if (driver.getActive() || (!driver.getActive() && includeInactiveDrivers)) {
-                distinctDriverIds.add(driver.getAuthUserID());
+    private Set<String> buildDistinctListOfDriverIds(List<Rating> matchedRatingsList) {
+        Set<String> distinctDriverIds = new HashSet<>();
+        for (Rating rating : matchedRatingsList) {
+            for (Map.Entry<String, String> driver : restaurant.getDrivers().entrySet()) {
+                if (rating.getDriverId().equals(driver.getKey())) {
+                    distinctDriverIds.add(driver.getKey());
+                }
             }
         }
+
         return distinctDriverIds;
     }
 
@@ -237,6 +270,7 @@ public class DriverRatings extends AppCompatActivity {
     private double buildDriverAverageRating(String driverId, List<Rating> matchedRatingsList) {
         double totalRating = 0;
         int numberOfRatings = 0;
+        double averageRating = 0;
 
         for (Rating rating : matchedRatingsList) {
             if (rating.getDriverId().equals(driverId)) {
@@ -245,6 +279,32 @@ public class DriverRatings extends AppCompatActivity {
             }
         }
 
-        return totalRating/numberOfRatings;
+        if (numberOfRatings > 0) {
+            averageRating = totalRating / numberOfRatings;
+        }
+
+        return averageRating;
+    }
+
+    /**
+     * isEndDateAfterStartDate checks to see if the provided end date occurs after the
+     * provided start date
+     * @param startDate indicates the start date
+     * @param endDate indicates the end date
+     * @return true or false
+     */
+    private boolean isEndDateAfterStartDate(String startDate, String endDate) {
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+        Date startingDate = new Date();
+        Date endingDate = new Date();
+
+        try {
+            startingDate = format.parse(startDate);
+            endingDate = format.parse(endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return endingDate.after(startingDate);
     }
 }

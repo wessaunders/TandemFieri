@@ -3,7 +3,6 @@ package com.gmail.dleemcewen.tandemfieri.Entities;
 import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,12 +16,13 @@ public class Restaurant extends Entity implements Serializable {
     private String zipcode;
     private Double charge;
     private String ownerId;
-    private List<User> drivers;
+    private Map<String, String> drivers;
 
     /**
      * Default constructor
      */
-    public Restaurant() {}
+    public Restaurant() {
+    }
 
     /**
      * Optional constructor
@@ -154,17 +154,17 @@ public class Restaurant extends Entity implements Serializable {
 
     /**
      * get the drivers associated with the restaurant
-     * @return return all of the drivers associated with the restaurant
+     * @return return all of the driver ids and names associated with the restaurant
      */
-    public List<User> getDrivers() {
+    public Map<String, String> getDrivers() {
         return drivers;
     }
 
     /**
      * sets the drivers associated with the restaurant
-     * @param drivers the drivers associated with the restaurant
+     * @param drivers the id and name of each driver associated with the restaurant
      */
-    public void setDrivers(List<User> drivers) {
+    public void setDrivers(Map<String, String> drivers) {
         this.drivers = drivers;
     }
 }

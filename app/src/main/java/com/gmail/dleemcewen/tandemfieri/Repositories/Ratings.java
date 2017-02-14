@@ -18,9 +18,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Ratings repository defines the database logic to use when adding, removing, or updating a Rating
@@ -108,7 +113,11 @@ public class Ratings<T extends Entity> extends Repository<Rating> {
         if (values.size() == 1) {
             query = buildEqualsQuery(dataContext, values.get(0), childNodesArray);
         } else {
-            query = buildRangeQuery(dataContext, values.get(0), values.get(1), childNodesArray);
+            query = buildRangeQuery(
+                dataContext,
+                toTimeStamp(values.get(0)).toString(),
+                toTimeStamp(values.get(1)).toString(),
+                childNodesArray);
         }
         final QueryCompleteListener<Rating> finalQueryCompleteListener = onQueryComplete;
 
@@ -133,5 +142,23 @@ public class Ratings<T extends Entity> extends Repository<Rating> {
                 Log.w("Ratings", "Ratings.find:onCancelled", databaseError.toException());
             }
         });
+    }
+
+    /**
+     * toTimeStamp converts a date string to a timestamp format
+     * @param dateString indicates the date string to convert
+     * @return date in timestamp format
+     */
+    private Timestamp toTimeStamp(String dateString) {
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+        Date formattedDate = new Date();
+
+        try {
+            formattedDate = format.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return new Timestamp(formattedDate.getTime());
     }
 }
