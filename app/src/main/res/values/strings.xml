@@ -33,9 +33,13 @@
     <string name="deliveryArea">Delivery Area</string>
     <string name="nameRequired">Name is required!</string>
     <string name="streetRequired">Street address is required!</string>
+    <string name="manage_restaurants">Manage restaurants (for testing)</string>
+    <string name="restaurant_main_menu">Restaurant Owner Main Menu</string>
     <string name="cityRequired">City is required!</string>
     <string name="stateRequired">State is required!</string>
     <string name="zipRequired">Zipcode is required!</string>
+    <string name="deliveryChargeRequired">A delivery charge amount is required!</string>
+    <string name="deliveryChargeGreaterThanZero">Delivery charge amount must be greater than zero!</string>
     <string name="addButton">Add</string>
     <string name="manageMenuItemsButton">Manage menu items</string>
     <string name="viewSalesButton">View sales/products</string>
@@ -53,4 +57,6 @@
     <string name="averageRating">Average rating</string>
     <string name="invalidEndDate">The selected end date cannot occur before the selected start date.</string>
     <string name="driverRatingsActivityTitle">Driver ratings</string>
+    <string name="updateButton">Update</string>
+    <string name="deliveryRadius">Delivery Radius (mi)</string>
 </resources>
