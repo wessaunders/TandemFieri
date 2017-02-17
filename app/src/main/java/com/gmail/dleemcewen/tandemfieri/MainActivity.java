@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authenticatorListener;
     private DatabaseReference dBase;
-    private User user;
     private Resources resources;
 
     private boolean verifiedEmailNotRequiredForLogin;
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
         dBase = FirebaseDatabase.getInstance().getReference().child("User");
 
-        user = new User();
         mAuth = FirebaseAuth.getInstance();
         authenticatorListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -89,38 +87,42 @@ public class MainActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(email.getText().toString().isEmpty()){
+                    Toast.makeText(getApplicationContext(), "Do not leave the Email blank", Toast.LENGTH_LONG).show();
+                }else if (password.getText().toString().isEmpty()){
+                    Toast.makeText(getApplicationContext(), "Do not leave the Password blank", Toast.LENGTH_LONG).show();
+                }else {
+                    mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                if (verifiedEmailNotRequiredForLogin || task.getResult().getUser().isEmailVerified()) {
+                                    Toast.makeText(getApplicationContext(), task.getResult().getUser().getEmail() + " was successfully signed in", Toast.LENGTH_LONG)
+                                            .show();
 
-                mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            if (verifiedEmailNotRequiredForLogin || task.getResult().getUser().isEmailVerified()) {
-                                Toast.makeText(getApplicationContext(), task.getResult().getUser().getEmail() + " was successfully signed in", Toast.LENGTH_LONG)
-                                      .show();
+                                    dBase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            navigateToMenu(dataSnapshot);
+                                        }
 
-                                dBase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        navigateToMenu(dataSnapshot);
-                                    }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "That user is not verified, check email for verification link.", Toast.LENGTH_LONG)
+                                            .show();
+                                }
                             } else {
-                                Toast.makeText(getApplicationContext(), "That user is not verified, check email for verification link.", Toast.LENGTH_LONG)
+                                Toast
+                                        .makeText(getApplicationContext(), "Sign in was not successful. Check login details please.", Toast.LENGTH_LONG)
                                         .show();
-                            }
-                        } else {
-                            Toast
-                                    .makeText(getApplicationContext(), "Sign in was not successful. Check login details please.", Toast.LENGTH_LONG)
-                                    .show();
-                        }//end if task.successful
-                    }//end onComplete
-                });//end sign in
-
+                            }//end if task.successful
+                        }//end onComplete
+                    });//end sign in
+                }
 
             }//end on click
         });//end sign in button
@@ -182,85 +184,3 @@ public class MainActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(authenticatorListener);
     }
 }//end activity
-
-
-    /* example finding user and navigating to appropriate main menu with repository */
-    /*private void signInTest()
-    {
-        // this would be a variable accessible from the entire activity
-        final Users<User> usersRepo = new Users<User>();
-
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Toast
-                                    .makeText(getApplicationContext(), task.getResult().getUser().getEmail() +" was successfully signed in", Toast.LENGTH_LONG)
-                                    .show();
-
-                            final String uid = task.getResult().getUser().getUid();
-
-                            usersRepo.find(Arrays.asList("Diner"), uid, new QueryCompleteListener<User>() {
-                                Bundle bundle = new Bundle();
-                                Intent intent = null;
-
-                                @Override
-                                public void onQueryComplete(ArrayList<User> entities) {
-                                    if (entities.isEmpty()) {
-                                        usersRepo.find(Arrays.asList("Driver"), uid, new QueryCompleteListener<User>() {
-                                            @Override
-                                            public void onQueryComplete(ArrayList<User> entities) {
-                                                if (entities.isEmpty()) {
-                                                    usersRepo.find(Arrays.asList("Restaurant"), uid, new QueryCompleteListener<User>() {
-                                                        @Override
-                                                        public void onQueryComplete(ArrayList<User> entities) {
-                                                            if (entities.isEmpty()) {
-                                                                //no user found
-                                                                Toast
-                                                                        .makeText(getApplicationContext(), "Invalid user.  The authorities have been notified.", Toast.LENGTH_LONG)
-                                                                        .show();
-
-                                                            } else {
-                                                                //found restaurant
-                                                                intent = new Intent(MainActivity.this, RestaurantMainMenu.class);
-                                                                bundle.putSerializable("User", entities.get(0));
-                                                                intent.putExtras(bundle);
-                                                                startActivity(intent);
-                                                            } //end restaurant find
-                                                        }
-                                                    });
-                                                } else {
-                                                    //found driver
-                                                    intent = new Intent(MainActivity.this, DriverMainMenu.class);
-                                                    bundle.putSerializable("User", entities.get(0));
-                                                    intent.putExtras(bundle);
-                                                    startActivity(intent);
-
-                                                }  //end driver find
-                                            }
-                                        });
-                                    } else {
-                                        //found diner!
-                                        intent = new Intent(MainActivity.this, DinerMainMenu.class);
-                                        bundle.putSerializable("User", entities.get(0));
-                                        intent.putExtras(bundle);
-                                        startActivity(intent);
-                                    }   // end diner find
-                                }
-                            });
-
-                        } else {
-                            Toast
-                                    .makeText(getApplicationContext(), "Sign in was not successful", Toast.LENGTH_LONG)
-                                    .show();
-                        }//end if task.successful
-                    }//end onComplete
-                });//end sign in
-
-
-            }//end on click
-        });//end sign in button
- */
