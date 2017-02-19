@@ -1,5 +1,6 @@
 package com.gmail.dleemcewen.tandemfieri.Repositories;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -28,6 +29,15 @@ import java.util.List;
 
 public class Users<T extends Entity> extends Repository<User> {
     private DatabaseReference dataContext;
+    private Context context;
+
+    /**
+     * Default constructor
+     * @param context indicates the current application context
+     */
+    public Users(Context context) {
+        this.context = context;
+    }
 
     /**
      * find users from the database

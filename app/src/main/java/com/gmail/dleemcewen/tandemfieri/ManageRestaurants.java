@@ -63,39 +63,7 @@ public class ManageRestaurants extends AppCompatActivity {
             restaurant = listAdapter.findRefrenceToUpdate(restaurant);
             restaurant.setMenu(temp);
 
-            Restaurants<Restaurant> restaurantsRepository = new Restaurants<>();
-
-            restaurantsRepository
-                    .update(restaurant);
-//                    .continueWith(new Continuation<AbstractMap.SimpleEntry<Boolean ,DatabaseError>,
-//                            Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>>>() {
-//                        @Override
-//                        public Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>> then(@NonNull Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>> task)
-//                                throws Exception {
-//                            TaskCompletionSource<AbstractMap.SimpleEntry<Boolean, DatabaseError>> taskCompletionSource =
-//                                    new TaskCompletionSource<>();
-//
-//                            AbstractMap.SimpleEntry<Boolean, DatabaseError> taskResult = task.getResult();
-//                            StringBuilder toastMessage = new StringBuilder();
-//
-//                            if (taskResult.getKey()) {
-//                                toastMessage.append("Restaurant updated successfully");
-//                            } else {
-//                                toastMessage.append(taskResult.getValue().getMessage());
-//                                toastMessage.append(". The restaurant was not created correctly");
-//                            }
-//
-//                            Toast
-//                                    .makeText(ManageRestaurants.this, toastMessage.toString(), Toast.LENGTH_LONG)
-//                                    .show();
-//
-//                            Intent intent=new Intent();
-//                            setResult(RESULT_OK,intent);
-//                            finish();
-//
-//                            return taskCompletionSource.getTask();
-//                        }
-//                    });
+            restaurants.update(restaurant);
         }
     }
 
@@ -110,16 +78,16 @@ public class ManageRestaurants extends AppCompatActivity {
      */
     private void initialize() {
         context = this;
-        restaurants = new Restaurants<>();
+        restaurants = new Restaurants<>(context);
 
         Bundle bundle = this.getIntent().getExtras();
         currentUser = (User)bundle.getSerializable("User");
-        Toast.makeText(getApplicationContext(),"The user is " + currentUser.getEmail(), Toast.LENGTH_LONG).show();
-        if(currentUser.getAuthUserID() != null){
-            Toast.makeText(getApplicationContext(),"The id is " + currentUser.getAuthUserID(), Toast.LENGTH_LONG).show();
-        }else{
-            Toast.makeText(getApplicationContext(),"The id is null", Toast.LENGTH_LONG).show();
-        }
+        //Toast.makeText(getApplicationContext(),"The user is " + currentUser.getEmail(), Toast.LENGTH_LONG).show();
+        //if(currentUser.getAuthUserID() != null){
+        //    Toast.makeText(getApplicationContext(),"The id is " + currentUser.getAuthUserID(), Toast.LENGTH_LONG).show();
+        //}else{
+        //    Toast.makeText(getApplicationContext(),"The id is null", Toast.LENGTH_LONG).show();
+        //}
 
         EventBus.getDefault().register(this);
     }

@@ -23,7 +23,7 @@ public class DriverMainMenu extends AppCompatActivity {
         Bundle bundle = this.getIntent().getExtras();
         user = (User) bundle.getSerializable("User");
 
-        Toast.makeText(getApplicationContext(),"The user is " + user.getEmail(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),"The user is " + user.getEmail(), Toast.LENGTH_LONG).show();
 
     }//end onCreate
 

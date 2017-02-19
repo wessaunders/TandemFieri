@@ -1,5 +1,6 @@
 package com.gmail.dleemcewen.tandemfieri.Repositories;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -33,6 +34,15 @@ import java.util.Locale;
 
 public class Ratings<T extends Entity> extends Repository<Rating> {
     private DatabaseReference dataContext;
+    private Context context;
+
+    /**
+     * Default constructor
+     * @param context indicates the current application context
+     */
+    public Ratings(Context context) {
+        this.context = context;
+    }
 
     /**
      * find entities from the database

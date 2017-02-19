@@ -48,7 +48,7 @@ public class EditAccountActivity extends AppCompatActivity {
         Bundle bundle = this.getIntent().getExtras();
         currentUser = (User) bundle.getSerializable("User");
         type = this.getIntent().getStringExtra("UserType");
-        users = new Users<>();
+        users = new Users<>(this);
 
 
         /*For the code I currently have, the key stored in the User object is not the same as the id in the database.

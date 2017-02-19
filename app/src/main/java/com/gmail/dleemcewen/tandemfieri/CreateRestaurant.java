@@ -24,7 +24,6 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class CreateRestaurant extends AppCompatActivity {
@@ -57,7 +56,7 @@ public class CreateRestaurant extends AppCompatActivity {
      * initialize all necessary variables
      */
     private void initialize() {
-        restaurantsRepository = new Restaurants<>();
+        restaurantsRepository = new Restaurants<>(this);
         restaurantOwnerId = getIntent().getStringExtra("ownerId");
     }
 
@@ -92,15 +91,7 @@ public class CreateRestaurant extends AppCompatActivity {
         createRestaurant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Validator.isValid(restaurantName, getString(R.string.nameRequired))
-                    && Validator.isValid(street, getString(R.string.streetRequired))
-                    && Validator.isValid(city, getString(R.string.cityRequired))
-                    && Validator.isValid(state, getString(R.string.stateRequired))
-                    && Validator.isValid(zipCode, getString(R.string.zipRequired))
-                    && Validator.isValid(deliveryCharge, getString(R.string.deliveryChargeRequired))
-                    && Validator.isValid(deliveryCharge, "^(0*[1-9][0-9]*(\\.[0-9]{0,2})?|0+\\.[0-9][1-9])$",
-                        getString(R.string.deliveryChargeGreaterThanZero))) {
-
+                if (checkForValidData()) {
                     //build a new restaurant
                     Restaurant restaurant = buildNewRestaurant();
 
@@ -108,30 +99,31 @@ public class CreateRestaurant extends AppCompatActivity {
                     //and then check the return value to ensure the restaurant was created successfully
                     restaurantsRepository
                         .add(restaurant)
-                        .continueWith(new Continuation<AbstractMap.SimpleEntry<Boolean ,DatabaseError>,
-                                Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>>>() {
+                        .continueWith(new Continuation<Map.Entry<Boolean ,DatabaseError>,
+                                Task<Map.Entry<Boolean, DatabaseError>>>() {
                             @Override
-                            public Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>> then(@NonNull Task<AbstractMap.SimpleEntry<Boolean, DatabaseError>> task)
+                            public Task<Map.Entry<Boolean, DatabaseError>> then(@NonNull Task<Map.Entry<Boolean, DatabaseError>> task)
                                     throws Exception {
-                                TaskCompletionSource<AbstractMap.SimpleEntry<Boolean, DatabaseError>> taskCompletionSource =
+                                TaskCompletionSource<Map.Entry<Boolean, DatabaseError>> taskCompletionSource =
                                     new TaskCompletionSource<>();
 
-                                AbstractMap.SimpleEntry<Boolean, DatabaseError> taskResult = task.getResult();
+                                Map.Entry<Boolean, DatabaseError> taskResult = task.getResult();
                                 StringBuilder toastMessage = new StringBuilder();
 
                                 if (taskResult.getKey()) {
                                     toastMessage.append("Restaurant created successfully");
                                 } else {
-                                    toastMessage.append(taskResult.getValue().getMessage());
-                                    toastMessage.append(". The restaurant was not created correctly");
+                                    toastMessage.append("An error occurred while creating the restaurant.  Please check your network connection and try again.");
                                 }
-
                                 Toast
                                     .makeText(CreateRestaurant.this, toastMessage.toString(), Toast.LENGTH_LONG)
                                     .show();
 
-                                EventBus.getDefault().post(new ActivityEvent(ActivityEvent.Result.REFRESH_RESTAURANT_LIST));
-                                finish();
+                                //Only go back to the manage restaurants screen if the restaurant was created successfully...
+                                if (taskResult.getKey()) {
+                                    EventBus.getDefault().post(new ActivityEvent(ActivityEvent.Result.REFRESH_RESTAURANT_LIST));
+                                    finish();
+                                }
 
                                 return taskCompletionSource.getTask();
                             }
@@ -152,7 +144,7 @@ public class CreateRestaurant extends AppCompatActivity {
 
     /**
      * underline the text in the provided textview
-     * @param textViewControl identifies the textview control containing the text to be underlined
+    * @param textViewControl identifies the textview control containing the text to be underlined
      */
     private void underlineText(TextView textViewControl) {
         String textToUnderline = textViewControl.getText().toString();
@@ -178,5 +170,25 @@ public class CreateRestaurant extends AppCompatActivity {
         restaurant.setDeliveryRadius(getBaseContext().getResources().getInteger(R.integer.defaultDeliveryRadius));
 
         return restaurant;
+    }
+
+    /**
+     * checkForValidData checks to ensure that the information entered in to the create restaurant
+     * view is valid
+     * @return true or false
+     */
+    private boolean checkForValidData() {
+        ArrayList<Boolean> validations = new ArrayList<>();
+
+        validations.add(Validator.isValid(restaurantName, getString(R.string.nameRequired)));
+        validations.add(Validator.isValid(street, getString(R.string.streetRequired)));
+        validations.add(Validator.isValid(city, getString(R.string.cityRequired)));
+        validations.add(Validator.isValid(state, getString(R.string.stateRequired)));
+        validations.add(Validator.isValid(zipCode, getString(R.string.zipRequired)));
+        validations.add(Validator.isValid(deliveryCharge, getString(R.string.deliveryChargeRequired)));
+        validations.add(Validator.isValid(deliveryCharge, "^(0*[1-9][0-9]*(\\.[0-9]{0,2})?|0+\\.[0-9][1-9])$",
+                getString(R.string.deliveryChargeGreaterThanZero)));
+
+        return !validations.toString().contains("false");
     }
 }
