@@ -19,6 +19,7 @@ public final class FormConstants {
     public static final String REG_EX_PHONE = "\\d{10}";
     public static final String REG_EX_EMAIL = "([\\w-\\.]+)@((?:[\\w]+\\.)+)([a-zA-Z]{2,4})";
     public static final String REG_EX_PASSWORD = "(.*\\w.*){6,}";
+    public static final String REG_EX_MONETARY = "^(0*[1-9][0-9]*(\\.[0-9]{0,2})?|0+\\.[0-9][1-9])$";
 
     /*Error Tags */
     public static final String ERROR_TAG_FIRSTNAME = "Invalid first name. Must be non-empty and contain only letters and spaces.";
