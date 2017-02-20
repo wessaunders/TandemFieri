@@ -49,18 +49,6 @@ public class LogWriter {
     }
 
     /**
-     * addHandler adds a new handler to the global logger
-     * @param handler indicates the new handler to add
-     */
-    /*
-    public static void addHandler(Handler handler) {
-        LogManager
-            .getLogManager()
-            .getLogger(Logger.GLOBAL_LOGGER_NAME)
-            .addHandler(handler);
-    }
-*/
-    /**
      * setMinimumLoggingLevel sets the minimum logging level
      * any messages whose logging level falls below the minimum logging level
      * that has been set will not be logged
@@ -79,32 +67,6 @@ public class LogWriter {
      */
     public static void setMinimumLoggingLevel(Level level) {
         minimumLoggingLevel = level;
-
-        //LogManager
-        //    .getLogManager()
-        //    .getLogger(Logger.GLOBAL_LOGGER_NAME)
-        //    .setLevel(level);
-
-        /*
-        LogManager logManager = LogManager
-                .getLogManager();
-
-        //get the logger names
-        Enumeration<String> loggerNames = logManager.getLoggerNames();
-
-        //loop through the logger names
-        while (loggerNames.hasMoreElements()) {
-            String loggerName = loggerNames.nextElement();
-
-            Logger logger = logManager.getLogger(loggerName);
-            if (logger != null) {
-                Level loggerLevel = logger.getLevel();
-                if (loggerLevel != null) {
-                    logger.setLevel(level);
-                }
-            }
-        }
-        */
     }
 
     /**

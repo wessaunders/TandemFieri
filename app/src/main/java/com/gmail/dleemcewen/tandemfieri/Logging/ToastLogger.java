@@ -8,6 +8,9 @@ import java.util.logging.Logger;
  */
 
 public class ToastLogger extends Logger {
+    /**
+     * Default constructor
+     */
     public ToastLogger() {
         super("ToastLogger", null);
 
