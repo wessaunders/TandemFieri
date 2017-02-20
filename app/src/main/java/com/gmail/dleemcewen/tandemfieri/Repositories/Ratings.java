@@ -8,6 +8,7 @@ import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
 import com.gmail.dleemcewen.tandemfieri.Abstracts.Repository;
 import com.gmail.dleemcewen.tandemfieri.Entities.Rating;
 import com.gmail.dleemcewen.tandemfieri.EventListeners.QueryCompleteListener;
+import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 
 /**
  * Ratings repository defines the database logic to use when adding, removing, or updating a Rating
@@ -149,7 +151,7 @@ public class Ratings<T extends Entity> extends Repository<Rating> {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Getting Rating failed, log a message
-                Log.w("Ratings", "Ratings.find:onCancelled", databaseError.toException());
+                LogWriter.log(context, Level.FINE, "Ratings.find:onCancelled " + databaseError.toException());
             }
         });
     }

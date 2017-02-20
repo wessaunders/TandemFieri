@@ -122,17 +122,12 @@ public class AlmostDoneActivity extends AppCompatActivity{
                     //TODO: Remove the following intents when they are no longer needed for testing
                     if (radioDining.isChecked() == true) {
                         mDatabase.child("User").child("Diner").child(user.getUid()).setValue(newUser);
-                        //intent = new Intent(AlmostDoneActivity.this, DinerMainMenu.class);
                     } else if (radioRestaurant.isChecked() == true){
                         mDatabase.child("User").child("Restaurant").child(user.getUid()).setValue(newUser);
-                        //intent = new Intent(AlmostDoneActivity.this, RestaurantMainMenu.class);
                     } else if (radioDriver.isChecked() == true){
                         mDatabase.child("User").child("Driver").child(user.getUid()).setValue(newUser);
-                        //intent = new Intent(AlmostDoneActivity.this, DriverMainMenu.class);
                     }
-                    //bundle.putSerializable("User", newUser);
-                    //intent.putExtras(bundle);
-                    //startActivity(intent);
+
                     user.sendEmailVerification();
                     finish();
                     CreateAccountActivity.getInstance().finish();

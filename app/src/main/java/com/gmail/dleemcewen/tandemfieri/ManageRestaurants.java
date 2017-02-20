@@ -9,13 +9,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gmail.dleemcewen.tandemfieri.Adapters.ManageRestaurantExpandableListAdapter;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.EventListeners.QueryCompleteListener;
 import com.gmail.dleemcewen.tandemfieri.Events.ActivityEvent;
+import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.gmail.dleemcewen.tandemfieri.MenuBuilder.MenuCatagory;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 
@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class ManageRestaurants extends AppCompatActivity {
     private TextView header;
@@ -82,12 +83,13 @@ public class ManageRestaurants extends AppCompatActivity {
 
         Bundle bundle = this.getIntent().getExtras();
         currentUser = (User)bundle.getSerializable("User");
-        //Toast.makeText(getApplicationContext(),"The user is " + currentUser.getEmail(), Toast.LENGTH_LONG).show();
-        //if(currentUser.getAuthUserID() != null){
-        //    Toast.makeText(getApplicationContext(),"The id is " + currentUser.getAuthUserID(), Toast.LENGTH_LONG).show();
-        //}else{
-        //    Toast.makeText(getApplicationContext(),"The id is null", Toast.LENGTH_LONG).show();
-        //}
+        LogWriter.log(getApplicationContext(), Level.INFO, "The user is " + currentUser.getEmail());
+
+        if(currentUser.getAuthUserID() != null){
+            LogWriter.log(getApplicationContext(), Level.INFO, "The id is " + currentUser.getAuthUserID());
+        }else{
+            LogWriter.log(getApplicationContext(), Level.INFO, "The id is null");
+        }
 
         EventBus.getDefault().register(this);
     }

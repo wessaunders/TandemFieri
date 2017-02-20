@@ -11,6 +11,7 @@ import com.gmail.dleemcewen.tandemfieri.Abstracts.Repository;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.EventListeners.QueryCompleteListener;
+import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.gmail.dleemcewen.tandemfieri.Tasks.AddRestaurantTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.NetworkConnectivityCheckTask;
 import com.google.android.gms.tasks.Continuation;
@@ -28,6 +29,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Restaurants repository defines the database logic to use when adding, removing, or updating a Restaurant
@@ -143,7 +145,7 @@ public class Restaurants<T extends Entity> extends Repository<Restaurant> {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Getting Restaurant failed, log a message
-                Log.w("Restaurants", "Restaurants.find:onCancelled", databaseError.toException());
+                LogWriter.log(context, Level.FINE, "Restaurants.find:onCancelled " + databaseError.toException());
             }
         });
     }
