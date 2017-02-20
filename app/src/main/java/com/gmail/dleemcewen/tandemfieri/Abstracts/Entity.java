@@ -17,7 +17,7 @@ public abstract class Entity {
 
     @Exclude
     public String getKey() {
-        if (key == "") {
+        if (key == null) {
             key = UUID.randomUUID().toString();
         }
 
