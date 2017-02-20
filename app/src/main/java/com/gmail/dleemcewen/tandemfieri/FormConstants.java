@@ -17,7 +17,7 @@ public final class FormConstants {
             "(wisconsin)|(wyoming))";
     public static final String REG_EX_ZIP = "\\d{5}|\\d{9}";
     public static final String REG_EX_PHONE = "\\d{10}";
-    public static final String REG_EX_EMAIL = "^[a-zA-Z0-9!#$%^&*-_=+]+@[a-zA-Z0-9!#$%^&*-_=+]+\\.[a-zA-Z]+$";
+    public static final String REG_EX_EMAIL = "([\\w-\\.]+)@((?:[\\w]+\\.)+)([a-zA-Z]{2,4})";
     public static final String REG_EX_PASSWORD = "(.*\\w.*){6,}";
 
     /*Error Tags */

@@ -183,7 +183,7 @@ public class CreateRestaurant extends AppCompatActivity {
         validations.add(Validator.isValid(street, getString(R.string.streetRequired)));
         validations.add(Validator.isValid(city, getString(R.string.cityRequired)));
         validations.add(Validator.isValid(state, getString(R.string.stateRequired)));
-        validations.add(Validator.isValid(zipCode, getString(R.string.zipRequired)));
+        validations.add(Validator.isValid(zipCode, FormConstants.REG_EX_ZIP, FormConstants.ERROR_TAG_ZIP));
         validations.add(Validator.isValid(deliveryCharge, getString(R.string.deliveryChargeRequired)));
         validations.add(Validator.isValid(deliveryCharge, "^(0*[1-9][0-9]*(\\.[0-9]{0,2})?|0+\\.[0-9][1-9])$",
                 getString(R.string.deliveryChargeGreaterThanZero)));
