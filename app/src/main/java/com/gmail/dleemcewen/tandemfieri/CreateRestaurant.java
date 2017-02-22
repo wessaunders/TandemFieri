@@ -205,7 +205,6 @@ public class CreateRestaurant extends AppCompatActivity implements AdapterView.O
         validations.add(Validator.isValid(restaurantName, getString(R.string.nameRequired)));
         validations.add(Validator.isValid(street, getString(R.string.streetRequired)));
         validations.add(Validator.isValid(city, getString(R.string.cityRequired)));
-        //validations.add(Validator.isValid(state, getString(R.string.stateRequired)));
         validations.add(Validator.isValid(zipCode, FormConstants.REG_EX_ZIP, FormConstants.ERROR_TAG_ZIP));
         validations.add(Validator.isValid(deliveryCharge, getString(R.string.deliveryChargeRequired)));
         validations.add(Validator.isValid(deliveryCharge, FormConstants.REG_EX_MONETARY,
