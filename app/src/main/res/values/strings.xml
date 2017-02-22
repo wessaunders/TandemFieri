@@ -47,6 +47,7 @@
     <string name="viewSalesButton">View sales/products</string>
     <string name="rateDriversButton">View driver ratings</string>
     <string name="viewDeliveryAreaButton">Set Delivery Area</string>
+    <string name="manageDriversButton">Manage drivers</string>
     <string name="manageRestaurantsActivityTitle">Managing restaurants</string>
     <string name="removeConfirmationQuestion">Are you sure you want to remove</string>
     <string name="yes">Yes</string>
@@ -64,4 +65,5 @@
     <string name="deliveryRadius">Delivery Radius (mi)</string>
     <string name="googleDecoderBaseURL">https://maps.googleapis.com/maps/api/geocode/json?</string>
     <string name="title_activity_diner_map">Map</string>
+    <string name="driversCurrentlyAssigned">Drivers currently assigned to </string>
 </resources>
