@@ -1,6 +1,7 @@
 package com.gmail.dleemcewen.tandemfieri.Abstracts;
 
 import com.google.firebase.database.Exclude;
+
 import java.util.UUID;
 
 /**

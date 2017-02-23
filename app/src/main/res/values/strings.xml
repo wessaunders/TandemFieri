@@ -1,5 +1,5 @@
 <resources>
-    <string name="minimum_logging_level">INFO</string>
+    <string name="minimum_logging_level">WARNING</string>
     <string name="app_name">Tandem Fieri</string>
     <string name="multiDex">multidex</string>
     <string name="signInTitle">Tandem Fieri</string>
@@ -65,5 +65,7 @@
     <string name="deliveryRadius">Delivery Radius (mi)</string>
     <string name="googleDecoderBaseURL">https://maps.googleapis.com/maps/api/geocode/json?</string>
     <string name="title_activity_diner_map">Map</string>
-    <string name="driversCurrentlyAssigned">Drivers currently assigned to </string>
+    <string name="driversCurrentlyAssigned">Currently assigned drivers</string>
+    <string name="availableDrivers">Drivers available to be assigned to </string>
+    <string name="manageRestaurantDriversActivityTitle">Managing restaurant drivers</string>
 </resources>

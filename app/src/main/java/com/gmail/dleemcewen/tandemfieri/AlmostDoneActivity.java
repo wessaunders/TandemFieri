@@ -121,7 +121,6 @@ public class AlmostDoneActivity extends AppCompatActivity{
                     newUser.setState(state);
                     newUser.setAuthUserID(user.getUid());
 
-                    //TODO: Remove the following intents when they are no longer needed for testing
                     if (radioDining.isChecked() == true) {
                         mDatabase.child("User").child("Diner").child(user.getUid()).setValue(newUser);
                     } else if (radioRestaurant.isChecked() == true){

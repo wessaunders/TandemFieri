@@ -1,9 +1,7 @@
 package com.gmail.dleemcewen.tandemfieri.Adapters;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -14,27 +12,22 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
-import com.gmail.dleemcewen.tandemfieri.ManageRestaurantDrivers;
 import com.gmail.dleemcewen.tandemfieri.R;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Users;
 
 import java.util.List;
 
 /**
- * ManageRestaurantDriversListAdapter provides the required methods to render the
- * listview used in the manage restaurant drivers activity
+ * AssignRestaurantDriversListAdapter provides the required methods to render the
+ * listview used in the assign restaurant drivers dialog
  */
-public class ManageRestaurantDriversListAdapter extends BaseAdapter {
+public class AssignRestaurantDriversListAdapter extends BaseAdapter {
     private Activity context;
     private List<User> restaurantDriversList;
-    private Resources resources;
-    private Users<User> usersRepository;
 
-    public ManageRestaurantDriversListAdapter(Activity context, List<User> restaurantDriversList) {
+    public AssignRestaurantDriversListAdapter(Activity context, List<User> restaurantDriversList) {
         this.context = context;
         this.restaurantDriversList = restaurantDriversList;
-        resources = context.getResources();
-        usersRepository = new Users<>(context);
     }
 
     /**
@@ -101,63 +94,17 @@ public class ManageRestaurantDriversListAdapter extends BaseAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final User user = (User)getItem(position);
+        User user = (User)getItem(position);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.manage_restaurant_drivers_list_item, null);
+            convertView = layoutInflater.inflate(android.R.layout.simple_list_item_1, null);
         }
 
-        TextView restaurantDriverName = (TextView)convertView.findViewById(R.id.restaurantDriverName);
+        TextView restaurantDriverName = (TextView)convertView.findViewById(android.R.id.text1);
         restaurantDriverName.setText(user.getFirstName() + " " + user.getLastName());
         restaurantDriverName.setTypeface(null, Typeface.BOLD);
-
-        Button removeRestaurantDriver = (Button)convertView.findViewById(R.id.removeRestaurantDriver);
-        removeRestaurantDriver.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StringBuilder dialogMessageBuilder = new StringBuilder();
-                dialogMessageBuilder.append(resources.getString(R.string.removeConfirmationQuestion));
-                dialogMessageBuilder.append(" ");
-                dialogMessageBuilder.append(user.getFirstName());
-                dialogMessageBuilder.append(" ");
-                dialogMessageBuilder.append(user.getLastName());
-                dialogMessageBuilder.append(" from the drivers assigned to this restaurant?");
-
-                AlertDialog.Builder removalConfirmationDialog  = new AlertDialog.Builder(context);
-                removalConfirmationDialog
-                        .setMessage(dialogMessageBuilder.toString());
-                removalConfirmationDialog
-                        .setTitle(resources.getString(R.string.manageRestaurantDriversActivityTitle));
-                removalConfirmationDialog.setCancelable(false);
-                removalConfirmationDialog.setPositiveButton(
-                        resources.getString(R.string.yes),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                restaurantDriversList.remove(user);
-
-                                user.setRestaurantId(null);
-                                usersRepository.update(user, new String[] {"Driver"});
-
-                                ((ManageRestaurantDrivers)context).getAssignedRestaurantDrivers();
-
-                                dialog.cancel();
-                            }
-                        });
-                removalConfirmationDialog.setNegativeButton(
-                        resources.getString(R.string.no),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-                removalConfirmationDialog
-                        .create()
-                        .show();
-            }
-        });
 
         return convertView;
     }
 }
-

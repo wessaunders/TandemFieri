@@ -238,7 +238,6 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
             convertView = layoutInflater.inflate(R.layout.manage_restaurants_list_item, null);
         }
 
-        //TODO: add click events for buttons
         Button manageMenuItems = (Button)convertView.findViewById(R.id.manageMenuItems);
         Button viewSales = (Button)convertView.findViewById(R.id.viewSales);
         Button viewDeliveryArea = (Button)convertView.findViewById(R.id.viewDeliveryArea);
@@ -283,6 +282,7 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("Restaurant", selectedChild);
+                bundle.putString("key", selectedChild.getKey());
                 Intent intent = new Intent(context, ManageRestaurantDrivers.class);
                 intent.putExtras(bundle);
                 context.startActivity(intent);
