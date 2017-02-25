@@ -19,6 +19,13 @@
         android:textSize="@dimen/button_text_size"
         android:text="@string/viewDeliveryAreaButton" />
     <Button
+        android:id="@+id/businessHours"
+        android:focusable="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/button_text_size"
+        android:text="@string/businessHours" />
+    <Button
         android:id="@+id/viewSales"
         android:focusable="false"
         android:layout_width="match_parent"

@@ -39,7 +39,6 @@ public class CreateRestaurant extends AppCompatActivity implements AdapterView.O
     private Spinner states;
     private EditText zipCode;
     private EditText deliveryCharge;
-    private Button businessHours;
     private Button createRestaurant;
     private Button cancelCreateRestaurant;
     private String restaurantOwnerId;
@@ -79,7 +78,6 @@ public class CreateRestaurant extends AppCompatActivity implements AdapterView.O
         states = (Spinner)findViewById(R.id.state);
         zipCode = (EditText)findViewById(R.id.zipcode);
         deliveryCharge = (EditText)findViewById(R.id.deliveryCharge);
-        businessHours = (Button)findViewById(R.id.businessHours);
         createRestaurant = (Button)findViewById(R.id.createRestaurant);
         cancelCreateRestaurant = (Button)findViewById(R.id.cancelRestaurant);
     }
@@ -89,13 +87,6 @@ public class CreateRestaurant extends AppCompatActivity implements AdapterView.O
      */
     private void bindEventHandlers() {
         states.setOnItemSelectedListener(this);
-
-        businessHours.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(CreateRestaurant.this, "Opening soon!", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         createRestaurant.setOnClickListener(new View.OnClickListener() {
             @Override
