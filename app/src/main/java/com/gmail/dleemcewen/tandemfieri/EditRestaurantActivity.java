@@ -107,8 +107,8 @@ public class EditRestaurantActivity extends AppCompatActivity implements Adapter
                     //update restaurant values
                     restaurant = updateRestaurantValues();
 
-                    //add the restaurant record
-                    //and then check the return value to ensure the restaurant was created successfully
+                    //update the restaurant record
+                    //and then check the return value to ensure the restaurant was updated successfully
                     restaurantsRepository
                         .update(restaurant)
                         .continueWith(new Continuation<Map.Entry<Boolean ,DatabaseError>,

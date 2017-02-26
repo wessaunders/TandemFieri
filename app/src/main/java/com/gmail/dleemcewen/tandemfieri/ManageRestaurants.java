@@ -125,7 +125,7 @@ public class ManageRestaurants extends AppCompatActivity {
      */
     private void retrieveData() {
         //find all the restaurants where the ownerid matches the current user id
-        restaurants.find(
+        /*restaurants.find(
             Arrays.asList("ownerId"),
             currentUser.getAuthUserID(),
             new QueryCompleteListener<Restaurant>() {
@@ -134,7 +134,11 @@ public class ManageRestaurants extends AppCompatActivity {
                     listAdapter = new ManageRestaurantExpandableListAdapter((Activity)context, entities, buildExpandableChildData(entities));
                     restaurantsList.setAdapter(listAdapter);
                 }
-        });
+        });*/
+
+        List<Restaurant> matchingRestaurants = restaurants.find(currentUser.getAuthUserID());
+        listAdapter = new ManageRestaurantExpandableListAdapter((Activity)context, matchingRestaurants, buildExpandableChildData(matchingRestaurants));
+        restaurantsList.setAdapter(listAdapter);
     }
 
     /**

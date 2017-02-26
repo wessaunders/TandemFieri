@@ -1,20 +1,116 @@
 package com.gmail.dleemcewen.tandemfieri.Abstracts;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+
 import com.gmail.dleemcewen.tandemfieri.EventListeners.QueryCompleteListener;
+import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
+import com.gmail.dleemcewen.tandemfieri.Query.QueryBuilder;
+import com.gmail.dleemcewen.tandemfieri.Query.RepositoryQuery;
+import com.gmail.dleemcewen.tandemfieri.Tasks.AddEntitiesTask;
+import com.gmail.dleemcewen.tandemfieri.Tasks.AddEntityTask;
+import com.gmail.dleemcewen.tandemfieri.Tasks.GetEntitiesTask;
+import com.gmail.dleemcewen.tandemfieri.Tasks.NetworkConnectivityCheckTask;
+import com.gmail.dleemcewen.tandemfieri.Tasks.RemoveEntitiesTask;
+import com.gmail.dleemcewen.tandemfieri.Tasks.RemoveEntityTask;
+import com.gmail.dleemcewen.tandemfieri.Tasks.UpdateEntityTask;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Repository defines the abstract class that all repositories extend
  */
 public abstract class Repository<T extends Entity> {
+    private Context context;
+    private List<T> entities;
     private DatabaseReference dataContext;
+    private final Class<T> childClass;
+    private List<String> searchNodes;
+
+    /**
+     * Default constructor
+     * @param context identifies the current application context
+     */
+    public Repository(final Context context) {
+        this.context = context;
+        this.childClass = getChildClassType();
+        entities = new ArrayList<>();
+        searchNodes = new ArrayList<>();
+
+        dataContext = getDataContext(childClass.getSimpleName());
+        dataContext.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Entity childEntityRecord = dataSnapshot.getValue(childClass);
+                childEntityRecord.setKey(dataSnapshot.getKey());
+
+                entities.add((T)childEntityRecord);
+
+                LogWriter.log(context, Level.FINEST, "added new child entity. " + entities.size() + " total entities in repository");
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                int matchingEntityIndex = -1;
+
+                for (int index = 0; index < entities.size() && matchingEntityIndex < 0; index++) {
+                    if (entities.get(index).getKey().equals(dataSnapshot.getKey()) ) {
+                        matchingEntityIndex = index;
+                    }
+                }
+
+                if (matchingEntityIndex > -1) {
+                    //entities.set(matchingEntityIndex, convertInstanceOfObject(dataSnapshot.getValue(childClass), childClass));
+                    entities.set(matchingEntityIndex, dataSnapshot.getValue(childClass));
+
+                    LogWriter.log(context, Level.FINE, "updated existing child entity at index " + matchingEntityIndex + ". " + entities.size() + " total entities in repository");
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                int matchingEntityIndex = -1;
+
+                for (int index = 0; index < entities.size() && matchingEntityIndex < 0; index++) {
+                    if (entities.get(index).getKey().equals(dataSnapshot.getKey()) ) {
+                        matchingEntityIndex = index;
+                    }
+                }
+
+                if (matchingEntityIndex > -1) {
+                    entities.remove(matchingEntityIndex);
+
+                    LogWriter.log(context, Level.FINE, "removed child entity at index " + matchingEntityIndex + ". " + entities.size() + " total entities in repository");
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                //not implemented
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO
+            }
+        });
+    }
 
     /**
      * add a single entity to the database
@@ -22,9 +118,12 @@ public abstract class Repository<T extends Entity> {
      * @param childNodes indicates the variable number of string arguments that identify the
      *                         child nodes that identify the location of the desired data
      */
-    public void add(T entity, String... childNodes) {
+    public Task<Map.Entry<Boolean, DatabaseError>> add(T entity, String... childNodes) {
         dataContext = getDataContext(entity.getClass().getSimpleName(), childNodes);
-        dataContext.child(entity.getKey().toString()).setValue(entity);
+
+        return Tasks.<Void>forResult(null)
+            .continueWithTask(new NetworkConnectivityCheckTask(context))
+            .continueWithTask(new AddEntityTask<T>(dataContext, entity, childNodes));
     }
 
     /**
@@ -33,12 +132,12 @@ public abstract class Repository<T extends Entity> {
      * @param childNodes indicates the variable number of string arguments that identify the
      *                         child nodes that identify the location of the desired data
      */
-    public void add(ArrayList<T> entities, String... childNodes) {
+    public Task<Map.Entry<Boolean, DatabaseError>> add(List<T> entities, String... childNodes) {
         dataContext = getDataContext(entities.get(0).getClass().getSimpleName(), childNodes);
-        for (T entity : entities) {
-            dataContext.child(entity.getKey().toString()).setValue(entity);
-        }
-    }
+
+        return Tasks.<Void>forResult(null)
+            .continueWithTask(new NetworkConnectivityCheckTask(context))
+            .continueWithTask(new AddEntitiesTask<T>(dataContext, entities, childNodes));    }
 
     /**
      * updates the specified entity
@@ -46,9 +145,12 @@ public abstract class Repository<T extends Entity> {
      * @param childNodes indicates the variable number of string arguments that identify the
      *                         child nodes that identify the location of the desired data
      */
-    public void update(T entity, String... childNodes) {
+    public Task<Map.Entry<Boolean, DatabaseError>> update(T entity, String... childNodes) {
         dataContext = getDataContext(entity.getClass().getSimpleName(), childNodes);
-        dataContext.child(entity.getKey().toString()).setValue(entity);
+
+        return Tasks.<Void>forResult(null)
+            .continueWithTask(new NetworkConnectivityCheckTask(context))
+            .continueWithTask(new UpdateEntityTask<T>(dataContext, entity));
     }
 
     /**
@@ -57,9 +159,12 @@ public abstract class Repository<T extends Entity> {
      * @param childNodes indicates the variable number of string arguments that identify the
      *                         child nodes that identify the location of the desired data
      */
-    public void remove(T entity, String... childNodes) {
+    public Task<Map.Entry<Boolean, DatabaseError>> remove(T entity, String... childNodes) {
         dataContext = getDataContext(entity.getClass().getSimpleName(), childNodes);
-        dataContext.child(entity.getKey().toString()).removeValue();
+
+        return Tasks.<Void>forResult(null)
+                .continueWithTask(new NetworkConnectivityCheckTask(context))
+                .continueWithTask(new RemoveEntityTask<T>(dataContext, entity));
     }
 
     /**
@@ -68,11 +173,55 @@ public abstract class Repository<T extends Entity> {
      * @param childNodes indicates the variable number of string arguments that identify the
      *                         child nodes that identify the location of the desired data
      */
-    public void remove(ArrayList<T> entities, String... childNodes) {
+    public Task<Map.Entry<Boolean, DatabaseError>> remove(List<T> entities, String... childNodes) {
         dataContext = getDataContext(entities.get(0).getClass().getSimpleName(), childNodes);
-        for (T entity : entities) {
-            dataContext.child(entity.getKey().toString()).removeValue();
+
+        return Tasks.<Void>forResult(null)
+                .continueWithTask(new NetworkConnectivityCheckTask(context))
+                .continueWithTask(new RemoveEntitiesTask<T>(dataContext, entities));
+    }
+
+    /**
+     * searchAtNode describes the node a find should begin at
+     * @param node indicates the node where a find should begin
+     * @return
+     */
+    public Repository<T> searchAtNode(String node) {
+        searchNodes.add(node);
+        return this;
+    }
+
+    /**
+     * find entities from the database
+     * @param queryString identifies the query string to send to the database
+     * @return all entities that match the provided query string
+     */
+    public List<T> find(final String queryString) {
+        String[] childNodes = new String[searchNodes.size()];
+        childNodes = searchNodes.toArray(childNodes);
+        final List<T> matchedEntities = new ArrayList<>();
+
+        dataContext = getDataContext(childClass.getSimpleName(), childNodes);
+
+        QueryBuilder queryBuilder = new QueryBuilder();
+        RepositoryQuery repositoryQuery = queryBuilder.build(childClass, queryString);
+
+        if (queryString != null && !queryString.trim().equals("")) {
+            for (T entity : entities) {
+
+            }
         }
+
+        if (matchedEntities.isEmpty()) {
+            for (T entity : entities) {
+                matchedEntities.add(entity);
+            }
+        }
+
+        //Clear after find complete
+        searchNodes.clear();
+
+        return matchedEntities;
     }
 
     /**
@@ -183,6 +332,29 @@ public abstract class Repository<T extends Entity> {
         }
 
         return query;
+    }
+
+    /**
+     * getChildClassType gets the child class type from the generic type parameter
+     * @return child class type
+     */
+    @SuppressWarnings("unchecked")
+    private Class<T> getChildClassType() {
+        return (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+
+    /**
+     * convertInstanceOfObject converts an object to the provided destination class
+     * @param objectInstance indicates the instance of the object to convert
+     * @param destinationClass identifies the destination class
+     * @return object converted to destination class
+     */
+    private T convertInstanceOfObject(Object objectInstance, Class<T> destinationClass) {
+        try {
+            return destinationClass.cast(objectInstance);
+        } catch(ClassCastException e) {
+            return null;
+        }
     }
 }
 
