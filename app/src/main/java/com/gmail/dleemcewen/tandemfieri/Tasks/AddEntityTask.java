@@ -26,10 +26,8 @@ public class AddEntityTask<T extends Entity> implements Continuation<Map.Entry<B
      * Default constructor
      * @param dataContext indicates the dataContext
      * @param entity identifies the entity to add
-     * @param childNodes indicates the variable number of string arguments that identify the
-     *                         child nodes that identify the location of the desired data
      */
-    public AddEntityTask(DatabaseReference dataContext, T entity, String... childNodes) {
+    public AddEntityTask(DatabaseReference dataContext, T entity) {
         this.dataContext = dataContext;
         this.entity = entity;
     }

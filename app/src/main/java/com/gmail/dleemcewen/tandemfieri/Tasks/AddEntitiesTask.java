@@ -16,14 +16,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * AddEntitiesTask defines the task to new entities that can be used with other chained tasks
+ * AddEntitiesTask defines the task to add new entities that can be used with other chained tasks
  */
 
 public class AddEntitiesTask<T extends Entity> implements Continuation<Map.Entry<Boolean, DatabaseError>, Task<Map.Entry<Boolean, DatabaseError>>> {
     private DatabaseReference dataContext;
     private List<T> entities;
 
-    public AddEntitiesTask(DatabaseReference dataContext, List<T> entities, String... childNodes) {
+    /**
+     * Default constructor
+     * @param dataContext indicates the dataContext
+     * @param entities identifies the entities to add
+     */
+    public AddEntitiesTask(DatabaseReference dataContext, List<T> entities) {
         this.dataContext = dataContext;
         this.entities = entities;
     }
