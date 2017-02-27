@@ -2,7 +2,7 @@ package com.gmail.dleemcewen.tandemfieri.Tasks;
 
 import android.support.annotation.NonNull;
 
-import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
+import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -15,26 +15,30 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 /**
- * AddRestaurantTask defines the task to add a new restaurant that can be used with other chained tasks
+ * RemoveEntityTask defines the task to remove an existing entity that can be used with other chained tasks
  */
 
-public class AddRestaurantTask implements Continuation<Map.Entry<Boolean, DatabaseError>, Task<Map.Entry<Boolean, DatabaseError>>> {
+public class RemoveEntityTask<T extends Entity> implements Continuation<Map.Entry<Boolean, DatabaseError>, Task<Map.Entry<Boolean, DatabaseError>>> {
     private DatabaseReference dataContext;
-    private Restaurant entity;
+    private T entity;
 
-    public AddRestaurantTask(DatabaseReference dataContext, Restaurant entity) {
+    /**
+     * Default constructor
+     * @param dataContext indicates the dataContext
+     * @param entity identifies the entity to remove
+     */
+    public RemoveEntityTask(DatabaseReference dataContext, T entity) {
         this.dataContext = dataContext;
         this.entity = entity;
     }
 
     @Override
     public Task<Map.Entry<Boolean, DatabaseError>> then(@NonNull Task<Map.Entry<Boolean, DatabaseError>> task) throws Exception {
-        final Restaurant entityReference = entity;
         final TaskCompletionSource<Map.Entry<Boolean, DatabaseError>> taskCompletionSource = new TaskCompletionSource<>();
 
         //only check the database if the result from the previous task was successful
         if (task.getResult().getKey()) {
-            dataContext.child(entity.getKey().toString()).setValue(entityReference);
+            dataContext.child(entity.getKey().toString()).removeValue();
 
             dataContext.addListenerForSingleValueEvent(new ValueEventListener() {
                 AbstractMap.SimpleEntry<Boolean, DatabaseError> listenerResult;
@@ -51,7 +55,6 @@ public class AddRestaurantTask implements Continuation<Map.Entry<Boolean, Databa
                     taskCompletionSource.setResult(listenerResult);
                 }
             });
-
         } else {
             taskCompletionSource.setResult(task.getResult());
         }
