@@ -16,6 +16,7 @@ import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Formatters.StringFormatter;
 import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Users;
+import com.gmail.dleemcewen.tandemfieri.Utility.MapUtil;
 import com.gmail.dleemcewen.tandemfieri.Utility.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

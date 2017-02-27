@@ -91,6 +91,8 @@ public class CreateRestaurant extends AppCompatActivity implements AdapterView.O
         states.setOnItemSelectedListener(this);
 
         deliveryHours.setOnClickListener(new View.OnClickListener() {
+
+            @Override
             public void onClick(View view) {
                 Intent intent = new Intent(CreateRestaurant.this, CreateDeliveryHoursActivity.class);
                 intent.putExtra("restId",restaurantId);

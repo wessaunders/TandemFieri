@@ -24,8 +24,8 @@ import com.gmail.dleemcewen.tandemfieri.ManageRestaurantDrivers;
 import com.gmail.dleemcewen.tandemfieri.R;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 import com.gmail.dleemcewen.tandemfieri.RestaurantMapActivity;
-import com.gmail.dleemcewen.tandemfieri.menubuilder.MenuBuilderActivity;
-import com.gmail.dleemcewen.tandemfieri.menubuilder.MenuCatagory;
+import com.gmail.dleemcewen.tandemfieri.MenuBuilder.MenuCatagory;
+import com.gmail.dleemcewen.tandemfieri.MenuBuilder.MenuBuilderActivity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -255,7 +255,6 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
         Button manageMenuItems = (Button)convertView.findViewById(R.id.manageMenuItems);
         Button viewSales = (Button)convertView.findViewById(R.id.viewSales);
         Button viewDeliveryArea = (Button)convertView.findViewById(R.id.viewDeliveryArea);
-        Button setBusinessHours = (Button)convertView.findViewById(R.id.businessHours);
         Button manageDrivers = (Button)convertView.findViewById(R.id.manageDrivers);
         Button rateDrivers = (Button)convertView.findViewById(R.id.rateDrivers);
         Button deliveryHours = (Button)convertView.findViewById(R.id.deliveryHours);
@@ -283,12 +282,6 @@ public class ManageRestaurantExpandableListAdapter extends BaseExpandableListAda
                 Toast
                     .makeText(context, "Viewing sales for " + selectedChild.getName(), Toast.LENGTH_SHORT)
                     .show();
-            }
-        });
-        setBusinessHours.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "Opening soon!", Toast.LENGTH_SHORT).show();
             }
         });
         viewDeliveryArea.setOnClickListener(new View.OnClickListener() {

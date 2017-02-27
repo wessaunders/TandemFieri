@@ -107,7 +107,7 @@ public class EditRestaurantActivity extends AppCompatActivity implements Adapter
         deliveryHours.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EditRestaurantActivity.this, CreateDeliveryHoursActivity.class)
+                Intent intent = new Intent(EditRestaurantActivity.this, CreateDeliveryHoursActivity.class);
                 intent.putExtra("restId", restaurant.getKey());
                 intent.putExtra("editOrCreate", "edit");
                 finish();
