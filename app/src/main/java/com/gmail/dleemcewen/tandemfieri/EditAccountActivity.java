@@ -25,7 +25,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Logger;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
@@ -39,6 +38,7 @@ public class EditAccountActivity extends AppCompatActivity implements AdapterVie
     private User changedUser;
     private String type = "";
     private String uid = "";
+
     private boolean emailIsDuplicated, userIsValid;
 
 
@@ -82,6 +82,7 @@ public class EditAccountActivity extends AppCompatActivity implements AdapterVie
         //reference in database to the current user
         mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(type).child(uid);
 
+
         if(currentUser != null) {
             LogWriter.log(getApplicationContext(), Level.INFO, "The user is " + currentUser.getEmail());
         }
@@ -104,6 +105,7 @@ public class EditAccountActivity extends AppCompatActivity implements AdapterVie
         saveButton = (Button) findViewById(R.id.save_Button);
         cancelButton = (Button) findViewById(R.id.cancel_Button);
 
+
         states.setOnItemSelectedListener(this);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -119,6 +121,7 @@ public class EditAccountActivity extends AppCompatActivity implements AdapterVie
         // Find the user's state in the array of states
         String[] arrayOfStates = getResources().getStringArray(R.array.states);
         int positionOfUserState = Arrays.asList(arrayOfStates).indexOf(StringFormatter.toProperCase(currentUser.getState()));
+
 
         //set text in fields using user's current information
         firstName.setText(currentUser.getFirstName());
@@ -185,14 +188,30 @@ public class EditAccountActivity extends AppCompatActivity implements AdapterVie
         boolean lastNameValid = isValid(lastName, FormConstants.REG_EX_LASTNAME, FormConstants.ERROR_TAG_LASTNAME);
         boolean addressValid = isValid(address, FormConstants.REG_EX_ADDRESS, FormConstants.ERROR_TAG_ADDRESS);
         boolean cityValid = isValid(city, FormConstants.REG_EX_CITY, FormConstants.ERROR_TAG_CITY);
+
+        //boolean stateValid = isValid(state, FormConstants.REG_EX_STATE, FormConstants.ERROR_TAG_STATE);
+
         boolean emailValid = isValid(email, FormConstants.REG_EX_EMAIL, FormConstants.ERROR_TAG_EMAIL);
         boolean phoneNumberValid = isValid(phoneNumber, FormConstants.REG_EX_PHONE, FormConstants.ERROR_TAG_PHONE);
         boolean zipValid = isValid(zip, FormConstants.REG_EX_ZIP, FormConstants.ERROR_TAG_ZIP);
+
+        String cityStr = city.getText().toString();
+        String zipStr = zip.getText().toString();
+        String street = address.getText().toString();
+        if (!MapUtil.verifyAddress(getApplicationContext(), street, cityStr, state, zipStr)) {
+            address.setError(FormConstants.ERROR_TAG_ADDRESS);
+            city.setError(FormConstants.ERROR_TAG_CITY);
+            zip.setError(FormConstants.ERROR_TAG_ZIP);
+            return result;
+        }
 
         if (    firstNameValid      &&
                 lastNameValid       &&
                 addressValid        &&
                 cityValid           &&
+
+                //stateValid          &&
+
                 zipValid            &&
                 phoneNumberValid    &&
                 emailValid) {
@@ -201,6 +220,7 @@ public class EditAccountActivity extends AppCompatActivity implements AdapterVie
         }
         return result;
     }
+
 
     /**
      * <p>Callback method to be invoked when an item in this view has been
