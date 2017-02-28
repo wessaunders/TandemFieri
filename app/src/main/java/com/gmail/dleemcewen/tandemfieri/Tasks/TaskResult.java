@@ -9,15 +9,18 @@ import java.util.List;
  * TaskResult defines an object that contains the results of a task
  */
 public class TaskResult<T> {
+    private String action;
     private List<T> results;
     private DatabaseError error;
 
     /**
      * Default constructor
+     * @param action indicates the type of action
      * @param results indicates the results of the task
      * @param error indicates a database error
      */
-    public TaskResult(List<T> results, DatabaseError error) {
+    public TaskResult(String action, List<T> results, DatabaseError error) {
+        this.action = action;
         this.results = results;
         this.error = error;
     }
@@ -29,6 +32,14 @@ public class TaskResult<T> {
     public TaskResult(DatabaseError error) {
         results = new ArrayList<T>();
         this.error = error;
+    }
+
+    /**
+     * getAction returns the action from the task
+     * @return action
+     */
+    public String getAction() {
+        return action;
     }
 
     /**
