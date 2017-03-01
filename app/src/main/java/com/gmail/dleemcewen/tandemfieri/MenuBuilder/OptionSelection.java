@@ -8,13 +8,10 @@ public class OptionSelection {
     private  double addedPrice;
     private String description;
 
-    public String getDescription() {
-        return description;
+    public OptionSelection(){
+
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public String getSelectionName() {
         return SelectionName;
@@ -32,9 +29,11 @@ public class OptionSelection {
         this.addedPrice = addedPrice;
     }
 
-    /**
-     * Constructor with no arguments required by firebase
-     */
-    public OptionSelection() {}
+    public String getDescription() {
+        return description;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
