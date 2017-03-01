@@ -1,5 +1,7 @@
 package com.gmail.dleemcewen.tandemfieri.Publishers;
 
+import android.os.Bundle;
+
 import com.gmail.dleemcewen.tandemfieri.Interfaces.IPublish;
 import com.gmail.dleemcewen.tandemfieri.Interfaces.ISubscriber;
 
@@ -8,23 +10,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Publisher is a singleton object that maintains and notifies subscribers as necessary
+ * NotificationPublisher is a singleton object that maintains and notifies subscribers as necessary
  */
 
-public class Publisher implements IPublish {
+public class NotificationPublisher implements IPublish {
     private List<ISubscriber> subscribers;
 
-    //create an object of Publisher
-    private static Publisher instance = new Publisher();
+    //create an object of NotificationPublisher
+    private static NotificationPublisher instance = new NotificationPublisher();
 
     //make the constructor private so that this class cannot be
     //instantiated
-    private Publisher() {
+    private NotificationPublisher() {
         subscribers = new ArrayList<>();
     }
 
     //Get the only object available
-    public static Publisher getInstance(){
+    public static NotificationPublisher getInstance(){
         return instance;
     }
 
@@ -47,13 +49,15 @@ public class Publisher implements IPublish {
     }
 
     /**
-     * notifySubscribers notifies all of the subscribers that there is new information available
+     * notifySubscribers notifies the appropriate subscribers that there is new information available
      */
     @Override
-    public void notifySubscribers(Map.Entry<String, Object> changedEntry) {
+    public void notifySubscribers(Bundle notification) {
         for (ISubscriber subscriber : subscribers) {
-            if (changedEntry.getKey().equals(subscriber.getType())) {
-                subscriber.update();
+            //Additionally need to use userid or some other identifier to ensure that
+            //the notification is going to the correct user, but that cannot be implemented until orders are available
+            if (notification.getString("notificationType").equals(subscriber.getNotificationType())) {
+                subscriber.update(notification);
             }
         }
     }

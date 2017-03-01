@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
+import com.gmail.dleemcewen.tandemfieri.Constants.NotificationConstants;
 import com.gmail.dleemcewen.tandemfieri.Services.NotificationService;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 public class SendNotificationTask<T extends Entity> implements Continuation<Map.Entry<Boolean, DatabaseError>, Task<TaskResult<T>>> {
     private Context context;
-    private String action;
+    private NotificationConstants.Action action;
     private T entity;
 
 
@@ -31,7 +32,7 @@ public class SendNotificationTask<T extends Entity> implements Continuation<Map.
      * @param action indicates the previous task action
      * @param entity indicate the entity
      */
-    public SendNotificationTask(Context context, String action, T entity) {
+    public SendNotificationTask(Context context, NotificationConstants.Action action, T entity) {
         this.context = context;
         this.action = action;
         this.entity = entity;
@@ -44,12 +45,13 @@ public class SendNotificationTask<T extends Entity> implements Continuation<Map.
         //only check the database if the result from the previous task was successful
         if (task.getResult().getKey()) {
             Intent intent = new Intent(context, NotificationService.class);
-            intent.putExtra("action", action);
+            intent.setAction(action.toString());
+            intent.putExtra("notificationClass", entity.getClass());
             intent.putExtra("entity", (Serializable) entity);
             intent.putExtra("key", entity.getKey());
             context.startService(intent);
 
-            taskCompletionSource.setResult(new TaskResult<T>(action, Arrays.asList(entity), null));
+            taskCompletionSource.setResult(new TaskResult<T>(action.toString(), Arrays.asList(entity), null));
         } else {
             taskCompletionSource.setResult(new TaskResult<T>(task.getResult().getValue()));
         }

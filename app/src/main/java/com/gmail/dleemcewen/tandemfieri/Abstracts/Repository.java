@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import com.gmail.dleemcewen.tandemfieri.Builders.QueryBuilder;
+import com.gmail.dleemcewen.tandemfieri.Constants.NotificationConstants;
 import com.gmail.dleemcewen.tandemfieri.EventListeners.QueryCompleteListener;
 import com.gmail.dleemcewen.tandemfieri.Services.NotificationService;
 import com.gmail.dleemcewen.tandemfieri.Tasks.AddEntitiesTask;
@@ -174,7 +175,7 @@ public abstract class Repository<T extends Entity> {
         return Tasks.<Void>forResult(null)
             .continueWithTask(new NetworkConnectivityCheckTask(context))
             .continueWithTask(new AddEntityTask<T>(dataContext, entity))
-            .continueWithTask(new SendNotificationTask<T>(context, "added", entity))
+            .continueWithTask(new SendNotificationTask<T>(context, NotificationConstants.Action.ADDED, entity))
             .continueWith(new Continuation<TaskResult<T>, TaskResult<T>>() {
                 @Override
                 public TaskResult<T> then(@NonNull Task<TaskResult<T>> task) throws Exception {
@@ -204,7 +205,7 @@ public abstract class Repository<T extends Entity> {
         return Tasks.<Void>forResult(null)
             .continueWithTask(new NetworkConnectivityCheckTask(context))
             .continueWithTask(new UpdateEntityTask<T>(dataContext, entity))
-            .continueWithTask(new SendNotificationTask<T>(context, "updated", entity))
+            .continueWithTask(new SendNotificationTask<T>(context, NotificationConstants.Action.UPDATED, entity))
             .continueWith(new Continuation<TaskResult<T>, TaskResult<T>>() {
                 @Override
                 public TaskResult<T> then(@NonNull Task<TaskResult<T>> task) throws Exception {
@@ -234,7 +235,7 @@ public abstract class Repository<T extends Entity> {
         return Tasks.<Void>forResult(null)
             .continueWithTask(new NetworkConnectivityCheckTask(context))
             .continueWithTask(new RemoveEntityTask<T>(dataContext, entity))
-            .continueWithTask(new SendNotificationTask<T>(context, "removed", entity))
+            .continueWithTask(new SendNotificationTask<T>(context, NotificationConstants.Action.REMOVED, entity))
             .continueWith(new Continuation<TaskResult<T>, TaskResult<T>>() {
                 @Override
                 public TaskResult<T> then(@NonNull Task<TaskResult<T>> task) throws Exception {
