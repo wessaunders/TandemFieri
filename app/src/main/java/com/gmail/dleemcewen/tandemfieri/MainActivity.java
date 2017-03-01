@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.AbstractMap;
 import java.util.logging.Level;
 
 public class MainActivity extends AppCompatActivity {
@@ -149,7 +150,10 @@ public class MainActivity extends AppCompatActivity {
             bundle.putSerializable("User", driver);
         }else if(restaurantOwner != null){
             //register new restaurant subscriber
-            registerNewSubscriber(new RestaurantSubscriber(MainActivity.this, mAuth.getCurrentUser().getUid()));
+            registerNewSubscriber(new RestaurantSubscriber(
+                    MainActivity.this,
+                    restaurantOwner,
+                    new AbstractMap.SimpleEntry<>("ownerId", mAuth.getCurrentUser().getUid())));
 
             intent = new Intent(MainActivity.this, RestaurantMainMenu.class);
             bundle.putSerializable("User", restaurantOwner);

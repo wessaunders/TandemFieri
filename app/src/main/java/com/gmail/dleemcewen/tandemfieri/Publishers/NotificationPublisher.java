@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.gmail.dleemcewen.tandemfieri.Interfaces.IPublish;
 import com.gmail.dleemcewen.tandemfieri.Interfaces.ISubscriber;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,10 +55,25 @@ public class NotificationPublisher implements IPublish {
     @Override
     public void notifySubscribers(Bundle notification) {
         for (ISubscriber subscriber : subscribers) {
-            //Additionally need to use userid or some other identifier to ensure that
-            //the notification is going to the correct user, but that cannot be implemented until orders are available
+            Map.Entry<String, String> filter = subscriber.getFilter();
+
             if (notification.getString("notificationType").equals(subscriber.getNotificationType())) {
-                subscriber.update(notification);
+                if (filter != null) {
+                    Object entity = notification.getSerializable("entity");
+                    try {
+                        Field filterField = entity.getClass().getDeclaredField(filter.getKey());
+                        filterField.setAccessible(true);
+                        if (filterField.get(entity).equals(filter.getValue())) {
+                            subscriber.update(notification);
+                        }
+                    } catch (NoSuchFieldException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    subscriber.update(notification);
+                }
             }
         }
     }

@@ -43,4 +43,10 @@ public class ItemOption implements Serializable{
         this.selections = new ArrayList<>();
     }
 
+    /**
+     * Constructor with no arguments required by firebase
+     */
+    public ItemOption() {
+
+    }
 }

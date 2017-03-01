@@ -2,6 +2,8 @@ package com.gmail.dleemcewen.tandemfieri.Interfaces;
 
 import android.os.Bundle;
 
+import java.util.Map;
+
 /**
  * ISubscriber describes the interface used by all subscribers
  */
@@ -14,10 +16,10 @@ public interface ISubscriber {
     String getNotificationType();
 
     /**
-     * getUserId returns the user id of the subscriber that wishes to receive notifications
-     * @return userid
+     * getFilter returns the record filter supplied by the subscriber
+     * @return record filter
      */
-    String getUserId();
+    Map.Entry<String, String> getFilter();
 
     /**
      * update provides the subscriber with updated information
