@@ -18,6 +18,7 @@ import com.gmail.dleemcewen.tandemfieri.Events.ActivityEvent;
 import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.gmail.dleemcewen.tandemfieri.MenuBuilder.MenuCatagory;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
+import com.gmail.dleemcewen.tandemfieri.MenuBuilder.MenuCatagory;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

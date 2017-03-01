@@ -19,6 +19,7 @@ public class Restaurant extends Entity implements Serializable {
     private String ownerId;
     private Integer deliveryRadius;
     private String id;
+    private String restaurantType;
     private Map<String, String> drivers;
 
     private MenuCatagory menu;
@@ -157,6 +158,22 @@ public class Restaurant extends Entity implements Serializable {
      */
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+    }
+
+    /**
+     * gets the restaurant type
+     * @return restaurant type
+     */
+    public String getRestaurantType() {
+        return restaurantType;
+    }
+
+    /**
+     * sets the restaurant type
+     * @param restaurantType identifies the type of restaurant
+     */
+    public void setRestaurantType(String restaurantType) {
+        this.restaurantType = restaurantType;
     }
 
     public MenuCatagory getMenu() {
