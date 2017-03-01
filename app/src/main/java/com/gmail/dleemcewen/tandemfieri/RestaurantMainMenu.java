@@ -1,5 +1,6 @@
 package com.gmail.dleemcewen.tandemfieri;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +25,14 @@ public class RestaurantMainMenu extends AppCompatActivity {
 
         Bundle bundle = this.getIntent().getExtras();
         user = (User) bundle.getSerializable("User");
+
+        int notificationId = bundle.getInt("notificationId");
+        if (notificationId != 0) {
+            NotificationManager notificationManager =
+                    (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
+
+            notificationManager.cancel(notificationId);
+        }
 
         LogWriter.log(getApplicationContext(), Level.INFO, "The user is " + user.getEmail());
     }//end onCreate

@@ -35,8 +35,10 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -65,9 +67,10 @@ public abstract class Repository<T extends Entity> {
                 childEntityRecord.setKey(dataSnapshot.getKey());
 
                 /*Intent intent = new Intent(context, NotificationService.class);
-                intent.putExtra("action", "Added");
-                intent.putExtra("class", childClass);
+                intent.setAction(NotificationConstants.Action.ADDED.toString());
+                intent.putExtra("notificationClass", childEntityRecord.getClass());
                 intent.putExtra("entity", (Serializable) childEntityRecord);
+                intent.putExtra("key", childEntityRecord.getKey());
                 context.startService(intent);*/
             }
 

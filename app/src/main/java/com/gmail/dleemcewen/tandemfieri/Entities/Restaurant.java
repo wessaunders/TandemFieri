@@ -1,10 +1,9 @@
 package com.gmail.dleemcewen.tandemfieri.Entities;
 
 import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
-import com.gmail.dleemcewen.tandemfieri.MenuBuilder.MenuCatagory;
+import com.gmail.dleemcewen.tandemfieri.menubuilder.MenuCatagory;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Restaurant defines all the properties and behaviors for a Restaurant entity

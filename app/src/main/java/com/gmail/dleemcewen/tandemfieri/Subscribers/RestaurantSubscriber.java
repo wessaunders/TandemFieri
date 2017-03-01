@@ -80,8 +80,12 @@ public class RestaurantSubscriber implements ISubscriber {
             notificationTextBuilder.append(notification.getString("action") == "ADDED" ? "a new " : "an updated ");
             notificationTextBuilder.append(" order!");
 
+            //set an id for the notification
+            int notificationId = 1;
+
             Bundle bundle = new Bundle();
             bundle.putSerializable("User", restaurantUser);
+            bundle.putInt("notificationId", notificationId);
 
             Intent resultIntent = new Intent(context, RestaurantMainMenu.class);
             resultIntent.putExtras(bundle);
@@ -94,7 +98,7 @@ public class RestaurantSubscriber implements ISubscriber {
                     context,
                     0,
                     resultIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent.FLAG_CANCEL_CURRENT);
 
             // Build notification
             NotificationCompat.Builder notificationBuilder =
@@ -108,9 +112,6 @@ public class RestaurantSubscriber implements ISubscriber {
             // This sets the pending intent that should be fired when the user clicks the
             // notification. Clicking the notification launches a new activity.
             notificationBuilder.setContentIntent(resultPendingIntent);
-
-            // Sets an ID for the notification
-            int notificationId = 1;
 
             // Gets an instance of the NotificationManager service
             NotificationManager notificationManager =
