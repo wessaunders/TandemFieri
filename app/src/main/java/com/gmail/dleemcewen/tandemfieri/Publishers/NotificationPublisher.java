@@ -7,6 +7,7 @@ import com.gmail.dleemcewen.tandemfieri.Interfaces.ISubscriber;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,16 +61,10 @@ public class NotificationPublisher implements IPublish {
             if (notification.getString("notificationType").equals(subscriber.getNotificationType())) {
                 if (filter != null) {
                     Object entity = notification.getSerializable("entity");
-                    try {
-                        Field filterField = entity.getClass().getDeclaredField(filter.getKey());
-                        filterField.setAccessible(true);
-                        if (filterField.get(entity).equals(filter.getValue())) {
-                            subscriber.update(notification);
-                        }
-                    } catch (NoSuchFieldException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                    if (((HashMap)entity)
+                        .get(filter.getKey())
+                        .equals(filter.getValue())) {
+                        subscriber.update(notification);
                     }
                 } else {
                     subscriber.update(notification);

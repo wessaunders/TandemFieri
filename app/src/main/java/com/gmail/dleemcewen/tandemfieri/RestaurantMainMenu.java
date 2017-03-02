@@ -8,8 +8,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.gmail.dleemcewen.tandemfieri.Entities.NotificationMessage;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
+import com.gmail.dleemcewen.tandemfieri.Repositories.NotificationMessages;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.logging.Level;
@@ -17,11 +19,14 @@ import java.util.logging.Level;
 public class RestaurantMainMenu extends AppCompatActivity {
 
     private User user;
+    private NotificationMessages<NotificationMessage> notificationsRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_main_menu);
+
+        notificationsRepository = new NotificationMessages<>(RestaurantMainMenu.this);
 
         Bundle bundle = this.getIntent().getExtras();
         user = (User) bundle.getSerializable("User");

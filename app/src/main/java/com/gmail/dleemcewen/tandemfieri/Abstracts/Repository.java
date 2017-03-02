@@ -1,16 +1,15 @@
 package com.gmail.dleemcewen.tandemfieri.Abstracts;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import com.gmail.dleemcewen.tandemfieri.Builders.QueryBuilder;
 import com.gmail.dleemcewen.tandemfieri.Constants.NotificationConstants;
+import com.gmail.dleemcewen.tandemfieri.Entities.NotificationMessage;
 import com.gmail.dleemcewen.tandemfieri.EventListeners.QueryCompleteListener;
-import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
-import com.gmail.dleemcewen.tandemfieri.Services.NotificationService;
 import com.gmail.dleemcewen.tandemfieri.Tasks.AddEntitiesTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.AddEntityTask;
+import com.gmail.dleemcewen.tandemfieri.Tasks.AddNotificationMessageTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.FindEntitiesTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.GetEntitiesTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.NetworkConnectivityCheckTask;
@@ -29,17 +28,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
 
 /**
  * Repository defines the abstract class that all repositories extend
@@ -180,7 +174,7 @@ public abstract class Repository<T extends Entity> {
         return Tasks.<Void>forResult(null)
             .continueWithTask(new NetworkConnectivityCheckTask(context))
             .continueWithTask(new AddEntityTask<T>(dataContext, entity))
-            .continueWithTask(new SendNotificationTask<T>(context, NotificationConstants.Action.ADDED, entity))
+            .continueWithTask(new AddNotificationMessageTask<T>(getDataContext(NotificationMessage.class.getSimpleName()), NotificationConstants.Action.ADDED, entity))
             .continueWith(new Continuation<TaskResult<T>, TaskResult<T>>() {
                 @Override
                 public TaskResult<T> then(@NonNull Task<TaskResult<T>> task) throws Exception {
@@ -210,7 +204,7 @@ public abstract class Repository<T extends Entity> {
         return Tasks.<Void>forResult(null)
             .continueWithTask(new NetworkConnectivityCheckTask(context))
             .continueWithTask(new UpdateEntityTask<T>(dataContext, entity))
-            .continueWithTask(new SendNotificationTask<T>(context, NotificationConstants.Action.UPDATED, entity))
+            .continueWithTask(new AddNotificationMessageTask<T>(getDataContext(NotificationMessage.class.getSimpleName()), NotificationConstants.Action.UPDATED, entity))
             .continueWith(new Continuation<TaskResult<T>, TaskResult<T>>() {
                 @Override
                 public TaskResult<T> then(@NonNull Task<TaskResult<T>> task) throws Exception {
@@ -240,7 +234,7 @@ public abstract class Repository<T extends Entity> {
         return Tasks.<Void>forResult(null)
             .continueWithTask(new NetworkConnectivityCheckTask(context))
             .continueWithTask(new RemoveEntityTask<T>(dataContext, entity))
-            .continueWithTask(new SendNotificationTask<T>(context, NotificationConstants.Action.REMOVED, entity))
+            .continueWithTask(new AddNotificationMessageTask<T>(getDataContext(NotificationMessage.class.getSimpleName()), NotificationConstants.Action.REMOVED, entity))
             .continueWith(new Continuation<TaskResult<T>, TaskResult<T>>() {
                 @Override
                 public TaskResult<T> then(@NonNull Task<TaskResult<T>> task) throws Exception {
@@ -380,7 +374,7 @@ public abstract class Repository<T extends Entity> {
      * @return child class type
      */
     @SuppressWarnings("unchecked")
-    private Class<T> getChildClassType() {
+    protected Class<T> getChildClassType() {
         return (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 

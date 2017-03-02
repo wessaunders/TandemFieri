@@ -49,13 +49,11 @@ public class NotificationService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Object entity = intent.getSerializableExtra("entity");
-        ((Entity)entity).setKey(intent.getStringExtra("key"));
-        Class notificationClass = (Class)intent.getSerializableExtra("notificationClass");
 
         Bundle notification = new Bundle();
         notification.putString("action", intent.getAction());
-        notification.putSerializable("notificationClass", notificationClass);
-        notification.putString("notificationType",notificationClass.getSimpleName());
+        notification.putString("notificationType", intent.getStringExtra("notificationType"));
+        notification.putString("key", intent.getStringExtra("key"));
         notification.putSerializable("entity", (Serializable)entity);
 
         NotificationPublisher notificationPublisher = NotificationPublisher.getInstance();

@@ -16,6 +16,7 @@ import com.gmail.dleemcewen.tandemfieri.R;
 import com.gmail.dleemcewen.tandemfieri.RestaurantMainMenu;
 
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -68,14 +69,14 @@ public class RestaurantSubscriber implements ISubscriber {
         if (context.getResources().getBoolean(R.bool.send_notifications)) {
             //TODO: update this to use orders instead of restaurants
             //Since the orders are not yet available, this simply simulates receiving a notification
-            Restaurant restaurant = (Restaurant)notification.getSerializable("entity");
+            HashMap notificationData = ((HashMap)notification.getSerializable("entity"));
 
             StringBuilder contentTextBuilder = new StringBuilder();
             contentTextBuilder.append("Order received for ");
-            contentTextBuilder.append(restaurant.getName());
+            contentTextBuilder.append(notificationData.get("name"));
 
             StringBuilder notificationTextBuilder = new StringBuilder();
-            notificationTextBuilder.append(restaurant.getName());
+            notificationTextBuilder.append(notificationData.get("name"));
             notificationTextBuilder.append(" received ");
             notificationTextBuilder.append(notification.getString("action") == "ADDED" ? "a new " : "an updated ");
             notificationTextBuilder.append(" order!");
@@ -104,7 +105,7 @@ public class RestaurantSubscriber implements ISubscriber {
             NotificationCompat.Builder notificationBuilder =
                     (NotificationCompat.Builder) new NotificationCompat.Builder(context)
                             .setSmallIcon(R.drawable.cast_ic_notification_small_icon)
-                            .setContentTitle(notificationType + " Notification")
+                            .setContentTitle(notificationType + " notification message")
                             .setContentText(contentTextBuilder.toString())
                             .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationTextBuilder.toString()))
                             .addAction(R.drawable.cast_ic_notification_2, "View order", resultPendingIntent);
