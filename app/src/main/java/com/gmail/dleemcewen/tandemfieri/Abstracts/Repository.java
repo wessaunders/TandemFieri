@@ -15,7 +15,6 @@ import com.gmail.dleemcewen.tandemfieri.Tasks.GetEntitiesTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.NetworkConnectivityCheckTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.RemoveEntitiesTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.RemoveEntityTask;
-import com.gmail.dleemcewen.tandemfieri.Tasks.SendNotificationTask;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
 import com.gmail.dleemcewen.tandemfieri.Tasks.UpdateEntityTask;
 import com.google.android.gms.tasks.Continuation;
