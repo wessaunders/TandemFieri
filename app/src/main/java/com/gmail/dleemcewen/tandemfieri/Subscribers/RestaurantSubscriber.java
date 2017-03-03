@@ -7,20 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 
-import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
-import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Interfaces.ISubscriber;
-import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.gmail.dleemcewen.tandemfieri.R;
 import com.gmail.dleemcewen.tandemfieri.RestaurantMainMenu;
 
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
-import static android.R.attr.action;
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
