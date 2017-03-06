@@ -35,7 +35,6 @@ import java.util.logging.Level;
  */
 
 public class Ratings<T extends Entity> extends Repository<Rating> {
-    private DatabaseReference dataContext;
     private Context context;
 
     /**

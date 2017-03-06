@@ -51,11 +51,15 @@ public class QueryBuilder {
      *                         of the desired data
      * @return query that can be executed by firebase to find desired records
      */
-    private static Query buildEqualsQuery(DatabaseReference dataContext, String equalsValue, String childNode) {
+    private static Query buildEqualsQuery(DatabaseReference dataContext, Object equalsValue, String childNode) {
         Query query = buildQuery(dataContext, childNode);
 
-        if (equalsValue != null && !equalsValue.equals("")) {
-            query = query.equalTo(equalsValue);
+        if (equalsValue != null && !equalsValue.toString().equals("")) {
+            if (equalsValue.toString().startsWith("'") && equalsValue.toString().endsWith("'")) {
+                query = query.equalTo(equalsValue.toString().replace("'", ""));
+            } else {
+                query = query.equalTo(Integer.valueOf(equalsValue.toString()));
+            }
         }
 
         return query;

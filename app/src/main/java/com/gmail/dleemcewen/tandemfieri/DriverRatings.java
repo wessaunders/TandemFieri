@@ -168,7 +168,7 @@ public class DriverRatings extends AppCompatActivity {
         if (startDate.getText().toString().equals("") && endDate.getText().toString().equals("")) {
             //no start and end date range has been provided, so get all of the ratings for the current restaurant
             ratingsRepository
-                .find("restaurantId = " + restaurant.getKey())
+                .find("restaurantId = '" + restaurant.getKey() + "'")
                 .addOnCompleteListener(DriverRatings.this, new OnCompleteListener<TaskResult<Rating>>() {
                     @Override
                     public void onComplete(@NonNull Task<TaskResult<Rating>> task) {

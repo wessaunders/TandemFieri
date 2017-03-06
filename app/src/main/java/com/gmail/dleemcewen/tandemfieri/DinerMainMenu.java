@@ -147,7 +147,7 @@ public class DinerMainMenu extends AppCompatActivity {
         //since they aren't available yet, instead produce a notification that will appear
         //to go to a restaurant
         restaurantsRepository
-            .find("id = 26804931-17e3-403a-ab75-a43e96e86814")
+            .find("id = '26804931-17e3-403a-ab75-a43e96e86814'")
             .addOnCompleteListener(new OnCompleteListener<TaskResult<Restaurant>>() {
                 @Override
                 public void onComplete(@NonNull Task<TaskResult<Restaurant>> task) {
