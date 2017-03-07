@@ -70,4 +70,6 @@
     <string name="manageRestaurantDriversActivityTitle">Managing restaurant drivers</string>
     <string name="updateRestaurant">Update Restaurant</string>
     <string name="restaurantType">Type of restaurant</string>
+    <string name="rateRestaurant">Rate restaurant</string>
+    <string name="rateableRestaurantsTitle">Which restaurant would you like to rate?</string>
 </resources>

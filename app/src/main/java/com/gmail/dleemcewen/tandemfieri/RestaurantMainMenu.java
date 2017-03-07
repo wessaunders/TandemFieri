@@ -45,10 +45,37 @@ public class RestaurantMainMenu extends AppCompatActivity {
                     (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
 
             notificationManager.cancel(notificationId);
+
+            notificationsRepository
+                .find("notificationId = '" + notificationId + "'")
+                .addOnCompleteListener(RestaurantMainMenu.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
+                    @Override
+                    public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
+                        List<NotificationMessage> messages = task.getResult().getResults();
+                        if (!messages.isEmpty()) {
+                            notificationsRepository.remove(messages.get(0));
+                        }
+                    }
+                });
         }
 
         LogWriter.log(getApplicationContext(), Level.INFO, "The user is " + user.getEmail());
     }//end onCreate
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (notificationsRepository == null) {
+            notificationsRepository = new NotificationMessages<>(RestaurantMainMenu.this);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        notificationsRepository.finalize();
+        notificationsRepository = null;
+    }
 
     //create menu
     @Override

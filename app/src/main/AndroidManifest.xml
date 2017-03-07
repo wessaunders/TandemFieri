@@ -44,7 +44,7 @@
         <activity android:name=".EditRestaurantActivity" />
         <activity android:name=".menubuilder.OptionSelectionListActivity" />
         <activity android:name=".menubuilder.OptionSelectionEditActivity" />
-        <activity android:name=".LookAtMenuActivity"></activity>
+        <activity android:name=".LookAtMenuActivity" />
         <activity
             android:name=".DinerMapActivity"
             android:label="@string/title_activity_diner_map" />
@@ -61,9 +61,11 @@
         <service
             android:name=".Utility.FetchAddressIntentService"
             android:exported="false" />
-
         <service
             android:name=".Services.NotificationService"
             android:exported="false" />
+
+        <activity android:name=".RestaurantRatings"></activity>
     </application>
+
 </manifest>

@@ -51,18 +51,6 @@ public class Ratings<T extends Entity> extends Repository<Rating> {
      *
      * @param childNodes      identifies the list of string arguments that indicates the
      *                        child node(s) that identify the location of the desired data
-     * @param values          indicates the values to search for
-     * @param onQueryComplete identifies the QueryCompleteListener to push results back to
-     */
-    public void find(List<String> childNodes, List<String> values, QueryCompleteListener<Rating> onQueryComplete) {
-        search(childNodes, values, onQueryComplete);
-    }
-
-    /**
-     * find entities from the database
-     *
-     * @param childNodes      identifies the list of string arguments that indicates the
-     *                        child node(s) that identify the location of the desired data
      * @param value           indicates the value to search for
      * @param onQueryComplete identifies the QueryCompleteListener to push results back to
      */
