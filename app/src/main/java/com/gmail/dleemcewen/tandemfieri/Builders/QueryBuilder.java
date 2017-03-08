@@ -26,10 +26,10 @@ public class QueryBuilder {
             if (splitQueryString.size() > 2) {
                 //use assignment to determine what kind of query to build
                 //TODO: refactor this to use strategies instead of a conditional
-                if (splitQueryString.get(1).toLowerCase().trim() == "between") {
+                if (splitQueryString.get(1).toLowerCase().trim().equals("between")) {
                     //set the assignment values
                     String assignmentValue1 = splitQueryString.get(2);
-                    String assignmentValue2 = splitQueryString.get(4);
+                    String assignmentValue2 = splitQueryString.get(5);
                     query = buildRangeQuery(dataContext, assignmentValue1, assignmentValue2, splitQueryString.get(0));
                 } else {
                     //set the assignment value

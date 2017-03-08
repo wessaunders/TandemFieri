@@ -1,19 +1,26 @@
 package com.gmail.dleemcewen.tandemfieri.Adapters;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.gmail.dleemcewen.tandemfieri.Entities.Rating;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
+import com.gmail.dleemcewen.tandemfieri.Formatters.DateFormatter;
 import com.gmail.dleemcewen.tandemfieri.R;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Ratings;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -98,63 +105,71 @@ public class RestaurantRatingsListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final Restaurant restaurant = (Restaurant)getItem(position);
+        final LayoutInflater layoutInflater = (LayoutInflater) this.context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) this.context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.restaurant_ratings_list_item, null);
         }
 
         TextView rateableRestaurantName = (TextView)convertView.findViewById(R.id.restaurantToRate);
         rateableRestaurantName.setText(restaurant.getName());
 
-        /*TextView restaurantDriverName = (TextView)convertView.findViewById(R.id.restaurantDriverName);
-        restaurantDriverName.setText(user.getFirstName() + " " + user.getLastName());
-        restaurantDriverName.setTypeface(null, Typeface.BOLD);
-
-        Button removeRestaurantDriver = (Button)convertView.findViewById(R.id.removeRestaurantDriver);
-        removeRestaurantDriver.setOnClickListener(new View.OnClickListener() {
+        Button selectRestaurantToRate = (Button)convertView.findViewById(R.id.selectRestaurantToRate);
+        selectRestaurantToRate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                StringBuilder dialogMessageBuilder = new StringBuilder();
-                dialogMessageBuilder.append(resources.getString(R.string.removeConfirmationQuestion));
-                dialogMessageBuilder.append(" ");
-                dialogMessageBuilder.append(user.getFirstName());
-                dialogMessageBuilder.append(" ");
-                dialogMessageBuilder.append(user.getLastName());
-                dialogMessageBuilder.append(" from the drivers assigned to this restaurant?");
+                StringBuilder dialogTitleBuilder = new StringBuilder();
+                dialogTitleBuilder.append("Rate ");
+                dialogTitleBuilder.append(restaurant.getName());
 
-                AlertDialog.Builder removalConfirmationDialog  = new AlertDialog.Builder(context);
-                removalConfirmationDialog
-                        .setMessage(dialogMessageBuilder.toString());
-                removalConfirmationDialog
-                        .setTitle(resources.getString(R.string.manageRestaurantDriversActivityTitle));
-                removalConfirmationDialog.setCancelable(false);
-                removalConfirmationDialog.setPositiveButton(
-                        resources.getString(R.string.yes),
+                //Inflate custom view
+                View dialogLayout = layoutInflater.inflate(R.layout.assign_restaurant_rating, null);
+
+                //Find restaurant rating text in dialoglayout
+                final TextView restaurantRatingText = (TextView)dialogLayout.findViewById(R.id.restaurantRatingText);
+
+                //Find ratingsbar in dialoglayout
+                final RatingBar restaurantRatingBar = (RatingBar)dialogLayout.findViewById(R.id.restaurantRatingBar);
+                restaurantRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                    @Override
+                    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                        restaurantRatingText.setText(String.valueOf(rating));
+                    }
+                });
+
+                //Build alert dialog with custom view
+                AlertDialog.Builder rateRestaurantDialog  = new AlertDialog.Builder(context);
+                rateRestaurantDialog.setView(dialogLayout);
+                rateRestaurantDialog
+                        .setTitle(dialogTitleBuilder.toString());
+                rateRestaurantDialog.setCancelable(false);
+                rateRestaurantDialog.setPositiveButton(
+                        resources.getString(R.string.save),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                restaurantDriversList.remove(user);
+                                Rating newRestaurantRating = new Rating();
+                                newRestaurantRating.setDate(DateFormatter.toTimeStamp(new Date()).toString());
+                                newRestaurantRating.setRating(restaurantRatingBar.getRating());
+                                newRestaurantRating.setRestaurantId(restaurant.getId());
 
-                                user.setRestaurantId(null);
-                                usersRepository.update(user, new String[] {"Driver"});
-
-                                ((ManageRestaurantDrivers)context).getAssignedRestaurantDrivers();
+                                ratingsRepository.add(newRestaurantRating);
 
                                 dialog.cancel();
                             }
                         });
-                removalConfirmationDialog.setNegativeButton(
-                        resources.getString(R.string.no),
+                rateRestaurantDialog.setNegativeButton(
+                        resources.getString(R.string.cancel),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                             }
                         });
-                removalConfirmationDialog
-                        .create()
+
+                rateRestaurantDialog
                         .show();
             }
-        });*/
+        });
 
         return convertView;
     }

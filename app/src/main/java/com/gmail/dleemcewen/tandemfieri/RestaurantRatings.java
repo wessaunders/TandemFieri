@@ -31,7 +31,6 @@ public class RestaurantRatings extends AppCompatActivity {
         findControlReferences();
         bindEventHandlers();
         retrieveData();
-        finalizeLayout();
     }
 
     /**
@@ -53,14 +52,14 @@ public class RestaurantRatings extends AppCompatActivity {
      * bind required event handlers
      */
     private void bindEventHandlers() {
-
     }
 
     /**
      * retrieve data
      */
     private void retrieveData() {
-        //find all the restaurants where the ownerid matches the current user id
+        //find all the restaurants
+        //TODO: possibly limit this to restaurants the user has ordered from - have to query orders and then get restaurants
         restaurants
             .find()
             .addOnCompleteListener(RestaurantRatings.this, new OnCompleteListener<TaskResult<Restaurant>>() {
@@ -71,12 +70,5 @@ public class RestaurantRatings extends AppCompatActivity {
                     rateableRestaurantsList.setAdapter(listAdapter);
                 }
             });
-    }
-
-    /**
-     * perform any final layout updates
-     */
-    private void finalizeLayout() {
-
     }
 }

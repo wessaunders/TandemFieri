@@ -8,6 +8,7 @@ import com.gmail.dleemcewen.tandemfieri.Abstracts.Entity;
 import com.gmail.dleemcewen.tandemfieri.Abstracts.Repository;
 import com.gmail.dleemcewen.tandemfieri.Entities.Rating;
 import com.gmail.dleemcewen.tandemfieri.EventListeners.QueryCompleteListener;
+import com.gmail.dleemcewen.tandemfieri.Formatters.DateFormatter;
 import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
@@ -115,8 +116,8 @@ public class Ratings<T extends Entity> extends Repository<Rating> {
         } else {
             query = buildRangeQuery(
                 dataContext,
-                toTimeStamp(values.get(0)).toString(),
-                toTimeStamp(values.get(1)).toString(),
+                DateFormatter.toTimeStamp(values.get(0)).toString(),
+                DateFormatter.toTimeStamp(values.get(1)).toString(),
                 childNodesArray);
         }
         final QueryCompleteListener<Rating> finalQueryCompleteListener = onQueryComplete;
@@ -142,23 +143,5 @@ public class Ratings<T extends Entity> extends Repository<Rating> {
                 LogWriter.log(context, Level.FINE, "Ratings.find:onCancelled " + databaseError.toException());
             }
         });
-    }
-
-    /**
-     * toTimeStamp converts a date string to a timestamp format
-     * @param dateString indicates the date string to convert
-     * @return date in timestamp format
-     */
-    private Timestamp toTimeStamp(String dateString) {
-        DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
-        Date formattedDate = new Date();
-
-        try {
-            formattedDate = format.parse(dateString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return new Timestamp(formattedDate.getTime());
     }
 }
