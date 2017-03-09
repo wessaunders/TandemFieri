@@ -82,7 +82,9 @@ public class DinerMainMenu extends AppCompatActivity {
                     }else{
                     }
                 }
-
+                return true;
+            case R.id.delivery:
+                launchDelivery();
                 return true;
             case R.id.sendSimulatedNotification:
                 //TODO: remove this after ordering and payment processing are in place
@@ -159,6 +161,16 @@ public class DinerMainMenu extends AppCompatActivity {
         //need to send user type so that the user can be located in the database
         //Bundle dinerBundle = new Bundle();
         Intent intent = new Intent(DinerMainMenu.this, DinerMapActivity.class);
+        //dinerBundle.putSerializable("User", user);
+        //intent.putExtras(dinerBundle);
+        //intent.putExtra("UserType", "Diner");
+        startActivity(intent);
+    }
+
+    private void launchDelivery(){
+        //need to send user type so that the user can be located in the database
+        //Bundle dinerBundle = new Bundle();
+        Intent intent = new Intent(DinerMainMenu.this, DeliveryMapActivity.class);
         //dinerBundle.putSerializable("User", user);
         //intent.putExtras(dinerBundle);
         //intent.putExtra("UserType", "Diner");
