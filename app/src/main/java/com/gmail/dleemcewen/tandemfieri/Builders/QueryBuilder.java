@@ -33,11 +33,11 @@ public class QueryBuilder {
                     String assignmentValue1 = splitQueryString.get(2);
                     String assignmentValue2 = splitQueryString.get(5);
 
+                    parsedQuery.setQuery(buildRangeQuery(dataContext, assignmentValue1, assignmentValue2, splitQueryString.get(0)));
                     parsedQuery.setField(splitQueryString.get(0));
                     parsedQuery.values.add(assignmentValue1);
                     parsedQuery.values.add(assignmentValue2);
                     parsedQuery.setQueryType(QueryConstants.QueryType.RANGE);
-                    parsedQuery.setQuery(buildRangeQuery(dataContext, assignmentValue1, assignmentValue2, splitQueryString.get(0)));
                 } else {
                     //Check to make sure this is an equals query
                     switch (splitQueryString.get(1))
@@ -53,9 +53,9 @@ public class QueryBuilder {
                     //set the assignment value
                     String assignmentValue = splitQueryString.get(2);
 
-                    parsedQuery.setField(splitQueryString.get(0));
-                    parsedQuery.values.add(assignmentValue);
                     parsedQuery.setQuery(buildEqualsQuery(dataContext, assignmentValue, splitQueryString.get(0)));
+                    parsedQuery.setField(splitQueryString.get(0));
+                    parsedQuery.values.add(assignmentValue.replace("'", ""));
                 }
             }
         }

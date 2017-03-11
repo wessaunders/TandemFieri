@@ -265,7 +265,7 @@ public abstract class Repository<T extends Entity> {
                         for (T item : taskResult.getKey()) {
                             Field field = item.getClass().getDeclaredField(query.getField());
                             field.setAccessible(true);
-                            if (!field.equals(query.values.get(0))) {
+                            if (!field.get(item).toString().equals(query.values.get(0).toString())) {
                                 notEqualItems.add(item);
                             }
                         }

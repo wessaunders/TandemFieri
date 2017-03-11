@@ -190,7 +190,6 @@ public class DinerMapActivity extends FragmentActivity implements GoogleApiClien
                             Intent intent = new Intent(DinerMapActivity.this, LookAtMenuActivity.class);
                             Bundle bundle = new Bundle();
                             bundle.putSerializable("Restaurant",  restaurants.get(k));
-                            bundle.putString("RestaurantKey", restaurants.get(k).getKey());
                             intent.putExtras(bundle);
                             startActivity(intent);
                         }
