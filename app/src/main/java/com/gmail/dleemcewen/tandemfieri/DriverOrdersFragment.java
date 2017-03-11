@@ -9,13 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.gmail.dleemcewen.tandemfieri.Adapters.DriverOrdersListAdapter;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
+import com.gmail.dleemcewen.tandemfieri.Enums.OrderEnum;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Orders;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
@@ -25,7 +25,7 @@ import com.google.android.gms.tasks.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DriverOrdersFragment extends DialogFragment{
+public class DriverOrdersFragment extends DialogFragment {
     private Fragment self;
     private String driverId;
     private String restaurantId;
@@ -41,22 +41,6 @@ public class DriverOrdersFragment extends DialogFragment{
      * Default constructor
      */
     public DriverOrdersFragment() {}
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param driverId driverId uniquely identifies the driver
-     * @return A new instance of fragment DriverOrdersFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DriverOrdersFragment newInstance(String driverId) {
-        DriverOrdersFragment fragment = new DriverOrdersFragment();
-        Bundle args = new Bundle();
-        args.putString("driverId", driverId);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -127,6 +111,7 @@ public class DriverOrdersFragment extends DialogFragment{
                 DriverOrdersFragment.this.dismiss();
             }
         });
+
     }
 
     /**
@@ -151,7 +136,8 @@ public class DriverOrdersFragment extends DialogFragment{
                 //restaurant owned by the owner that the driver isn't associated with
                 ordersRepository
                     .atNode(ownerId)
-                    .find("restaurantId = '" + restaurantId + "'")
+                    .atNode(restaurantId)
+                    .find("status != '" + OrderEnum.COMPLETE.toString() + "'")
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Order>>() {
                         @Override
                         public void onComplete(@NonNull Task<TaskResult<Order>> task) {
@@ -160,17 +146,30 @@ public class DriverOrdersFragment extends DialogFragment{
                             if (!restaurantOrders.isEmpty()) {
                                 List<Order> driverOrders = new ArrayList<>();
 
-                                //TODO: need way to identify which of these orders should be associated with a driver
-                                //for now, just assign all of them
-                                driverOrders.addAll(restaurantOrders);
+                                for (Order restaurantOrder : restaurantOrders) {
+                                    if (restaurantOrder.getStatus() != OrderEnum.COMPLETE) {
+                                        //TODO: need way to identify which of these orders should be associated with a driver
+                                        //for now, just assign all of them
+                                        driverOrders.add(restaurantOrder);
+                                    }
+                                }
 
                                 //bind the orders to the listview
-                                listAdapter = new DriverOrdersListAdapter(getActivity(), driverOrders);
+                                listAdapter = new DriverOrdersListAdapter(getActivity(), DriverOrdersFragment.this, driverOrders);
                                 myDeliveriesList.setAdapter(listAdapter);
                             }
                         }
                     });
             }
         });
+    }
+
+    /**
+     * setSelectedIndex sets the selected index of the item in the list
+     * @param index indicates the selected index
+     */
+    public void setSelectedIndex(int index) {
+        listAdapter.setSelectedIndex(index);
+        listAdapter.notifyDataSetChanged();
     }
 }

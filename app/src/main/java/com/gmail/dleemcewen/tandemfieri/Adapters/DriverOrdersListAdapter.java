@@ -9,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gmail.dleemcewen.tandemfieri.DriverOrdersFragment;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
+import com.gmail.dleemcewen.tandemfieri.Entities.OrderItem;
 import com.gmail.dleemcewen.tandemfieri.R;
+
 import java.util.List;
 
 /**
@@ -24,11 +26,21 @@ public class DriverOrdersListAdapter extends BaseAdapter {
     private Activity context;
     private Resources resources;
     private List<Order> ordersList;
+    private DriverOrdersFragment parentFragment;
+    private int selectedIndex;
 
-    public DriverOrdersListAdapter(Activity context, List<Order> ordersList) {
+    /**
+     * Default constructor
+     * @param context indicates the activity context
+     * @param ordersList identifies the list of orders
+     */
+    public DriverOrdersListAdapter(Activity context, DriverOrdersFragment parentFragment, List<Order> ordersList) {
         this.context = context;
         resources = context.getResources();
         this.ordersList = ordersList;
+        this.parentFragment = parentFragment;
+
+        selectedIndex = -1;
     }
 
     /**
@@ -94,40 +106,75 @@ public class DriverOrdersListAdapter extends BaseAdapter {
      * @return A View corresponding to the data at the specified position.
      */
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final Order order = (Order)getItem(position);
-        final LayoutInflater layoutInflater = (LayoutInflater) this.context
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        Order order = (Order)getItem(position);
+
+        LayoutInflater layoutInflater = (LayoutInflater) this.context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.driver_order_list_item, null);
         }
 
-        StringBuilder orderInformationBuilder = new StringBuilder();
-        orderInformationBuilder.append("Items: ");
-        orderInformationBuilder.append(order.getItems().size());
-        orderInformationBuilder.append(", ");
-        orderInformationBuilder.append("Total: ");
-        orderInformationBuilder.append(String.format("$%.2f", order.getTotal()));
+        final TextView orderInformation = (TextView)convertView.findViewById(R.id.driverOrderItem);
+        setOrderText(orderInformation, position);
 
-        TextView orderInformation = (TextView)convertView.findViewById(R.id.driverOrderItem);
-        orderInformation.setText(orderInformationBuilder.toString());
         orderInformation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*if (!driversToAssignToRestaurant.contains(unassignedDrivers.get(position))) {
-                    selectedDriver.setTextColor(ContextCompat.getColor(context, android.R.color.white));
-                    selectedDriver.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_dark));
-                    driversToAssignToRestaurant.add(unassignedDrivers.get(position));
-                } else {
-                    selectedDriver.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-                    selectedDriver.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
-                    driversToAssignToRestaurant.remove(unassignedDrivers.get(position));
-                }*/
+                parentFragment.setSelectedIndex(position);
             }
         });
 
         return convertView;
+    }
+
+    /**
+     * setSelectedIndex sets the selected index of the item in the list
+     * @param index indicates the selected index
+     */
+    public void setSelectedIndex(int index) {
+        selectedIndex = index;
+    }
+
+    private void setOrderText(TextView orderTextView, int position) {
+        Order order = (Order)getItem(position);
+        StringBuilder orderInformationBuilder = new StringBuilder();
+
+        if (selectedIndex == position) {
+            orderInformationBuilder.append("Items: ");
+            orderInformationBuilder.append(order.getItems().size());
+            orderInformationBuilder.append(", ");
+            orderInformationBuilder.append("Total: ");
+            orderInformationBuilder.append(String.format("$%.2f", order.getTotal()));
+            orderInformationBuilder.append("\r\n");
+            orderInformationBuilder.append("(");
+            for (int index = 0; index < order.getItems().size(); index++) {
+                orderInformationBuilder.append(order.getItems().get(index).getName());
+                if (index < order.getItems().size() - 1) {
+                    orderInformationBuilder.append(", ");
+                }
+            }
+            orderInformationBuilder.append(")");
+        } else {
+            orderInformationBuilder.append("Items: ");
+            orderInformationBuilder.append(order.getItems().size());
+            orderInformationBuilder.append(", ");
+            orderInformationBuilder.append("Total: ");
+            orderInformationBuilder.append(String.format("$%.2f", order.getTotal()));
+        }
+
+        orderTextView.setText(orderInformationBuilder.toString());
+        setOrderTextViewBackgroundColor(orderTextView, position);
+    }
+    private void setOrderTextViewBackgroundColor(TextView orderTextView, int position) {
+        if (selectedIndex == position) {
+            orderTextView.setTextColor(ContextCompat.getColor(context, android.R.color.white));
+            orderTextView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_dark));
+        } else {
+            orderTextView.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
+            orderTextView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+        }
     }
 }
 

@@ -1,5 +1,7 @@
 package com.gmail.dleemcewen.tandemfieri.Builders;
 
+import com.gmail.dleemcewen.tandemfieri.Constants.QueryConstants;
+import com.gmail.dleemcewen.tandemfieri.Query.ParsedQuery;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 
@@ -16,10 +18,10 @@ public class QueryBuilder {
      * @param dataContext indicates the dataContext
      * @param queryString identifies the querystring to parse.
      *                    Querystrings are either in the form of "<field> = <value>" or "<field> between <value1> and <value2>"
-     * @return the newly built query
+     * @return the parsed query
      */
-    public static Query build(DatabaseReference dataContext, String queryString) {
-        Query query = null;
+    public static ParsedQuery build(DatabaseReference dataContext, String queryString) {
+        ParsedQuery parsedQuery = new ParsedQuery();
 
         if (queryString != null && !queryString.trim().equals("")) {
             List<String> splitQueryString = Arrays.asList(queryString.split(" "));
@@ -30,16 +32,42 @@ public class QueryBuilder {
                     //set the assignment values
                     String assignmentValue1 = splitQueryString.get(2);
                     String assignmentValue2 = splitQueryString.get(5);
-                    query = buildRangeQuery(dataContext, assignmentValue1, assignmentValue2, splitQueryString.get(0));
+
+                    parsedQuery.setField(splitQueryString.get(0));
+                    parsedQuery.values.add(assignmentValue1);
+                    parsedQuery.values.add(assignmentValue2);
+                    parsedQuery.setQueryType(QueryConstants.QueryType.RANGE);
+                    parsedQuery.setQuery(buildRangeQuery(dataContext, assignmentValue1, assignmentValue2, splitQueryString.get(0)));
                 } else {
-                    //set the assignment value
-                    String assignmentValue = splitQueryString.get(2);
-                    query = buildEqualsQuery(dataContext, assignmentValue, splitQueryString.get(0));
+                    String assignmentValue;
+
+                    //Check to make sure this is an equals query
+                    switch (splitQueryString.get(1))
+                    {
+                        case "!=":
+                            //set the assignment value
+                            assignmentValue = "!" + splitQueryString.get(2);
+
+                            parsedQuery.setField(splitQueryString.get(0));
+                            parsedQuery.values.add(assignmentValue);
+                            parsedQuery.setQueryType(QueryConstants.QueryType.NOTEQUALS);
+                            parsedQuery.setQuery(buildEqualsQuery(dataContext, assignmentValue, splitQueryString.get(0)));
+                            break;
+                        default:
+                            //set the assignment value
+                            assignmentValue = splitQueryString.get(2);
+
+                            parsedQuery.setField(splitQueryString.get(0));
+                            parsedQuery.values.add(assignmentValue);
+                            parsedQuery.setQueryType(QueryConstants.QueryType.EQUALS);
+                            parsedQuery.setQuery(buildEqualsQuery(dataContext, assignmentValue, splitQueryString.get(0)));
+                            break;
+                    }
                 }
             }
         }
 
-         return query;
+         return parsedQuery;
     }
 
     /**
