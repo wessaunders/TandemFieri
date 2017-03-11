@@ -30,10 +30,10 @@ public class DriverOrdersFragment extends DialogFragment{
     private String driverId;
     private String restaurantId;
     private RelativeLayout myDeliveriesLayout;
-    private LinearLayout myDeliveriesContainer;
     private ListView myDeliveriesList;
     private DriverOrdersListAdapter listAdapter;
     private Button closeMyOrders;
+    private Button selectCurrentDelivery;
     private Orders<Order> ordersRepository;
     private Restaurants<Restaurant> restaurantsRepository;
 
@@ -105,9 +105,9 @@ public class DriverOrdersFragment extends DialogFragment{
      */
     private void findControlReferences(View view) {
         myDeliveriesLayout = (RelativeLayout)view.findViewById(R.id.myDeliveriesLayout);
-        myDeliveriesContainer = (LinearLayout)myDeliveriesLayout.findViewById(R.id.myDeliveriesContainer);
-        myDeliveriesList = (ListView)myDeliveriesContainer.findViewById(R.id.myDeliveriesList);
+        myDeliveriesList = (ListView)myDeliveriesLayout.findViewById(R.id.myDeliveriesList);
         closeMyOrders = (Button)myDeliveriesLayout.findViewById(R.id.closeMyOrders);
+        selectCurrentDelivery = (Button)myDeliveriesLayout.findViewById(R.id.selectCurrentDelivery);
     }
 
     /**
@@ -115,6 +115,13 @@ public class DriverOrdersFragment extends DialogFragment{
      */
     private void bindEventHandlers() {
         closeMyOrders.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DriverOrdersFragment.this.dismiss();
+            }
+        });
+
+        selectCurrentDelivery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DriverOrdersFragment.this.dismiss();

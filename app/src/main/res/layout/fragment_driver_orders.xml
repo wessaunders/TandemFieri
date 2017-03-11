@@ -18,31 +18,18 @@
             android:textSize="@dimen/title_text_size"
             android:textStyle="bold"
             android:text="@string/selectCurrentDelivery" />
-        <LinearLayout
-            android:id="@+id/myDeliveriesContainer"
+        <ListView
+            android:id="@+id/myDeliveriesList"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_below="@id/selectCurrentDeliveryTitle"
-            android:orientation="horizontal">
-            <ListView
-                android:id="@+id/myDeliveriesList"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:divider="@android:color/darker_gray"
-                android:dividerHeight="0.5dp" />
-            <View
-                android:id="@+id/myDeliveryDetail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-            </View>
-        </LinearLayout>
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="0.5dp" />
         <Button
             android:id="@+id/closeMyOrders"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/myDeliveriesContainer"
+            android:layout_below="@id/myDeliveriesList"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:text="@string/close">
@@ -51,7 +38,7 @@
             android:id="@+id/selectCurrentDelivery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/myDeliveriesContainer"
+            android:layout_below="@id/myDeliveriesList"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:text="@string/ok">
