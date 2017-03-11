@@ -16,7 +16,6 @@ public abstract class Entity {
     public Entity() {
     }
 
-    @Exclude
     public String getKey() {
         if (key == null) {
             key = UUID.randomUUID().toString();
@@ -25,7 +24,6 @@ public abstract class Entity {
         return key.toString();
     }
 
-    @Exclude
     public void setKey(String key) {
         this.key = key;
     }

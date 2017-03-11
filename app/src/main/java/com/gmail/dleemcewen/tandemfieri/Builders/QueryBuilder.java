@@ -39,30 +39,23 @@ public class QueryBuilder {
                     parsedQuery.setQueryType(QueryConstants.QueryType.RANGE);
                     parsedQuery.setQuery(buildRangeQuery(dataContext, assignmentValue1, assignmentValue2, splitQueryString.get(0)));
                 } else {
-                    String assignmentValue;
-
                     //Check to make sure this is an equals query
                     switch (splitQueryString.get(1))
                     {
                         case "!=":
-                            //set the assignment value
-                            assignmentValue = "!" + splitQueryString.get(2);
-
-                            parsedQuery.setField(splitQueryString.get(0));
-                            parsedQuery.values.add(assignmentValue);
                             parsedQuery.setQueryType(QueryConstants.QueryType.NOTEQUALS);
-                            parsedQuery.setQuery(buildEqualsQuery(dataContext, assignmentValue, splitQueryString.get(0)));
                             break;
                         default:
-                            //set the assignment value
-                            assignmentValue = splitQueryString.get(2);
-
-                            parsedQuery.setField(splitQueryString.get(0));
-                            parsedQuery.values.add(assignmentValue);
                             parsedQuery.setQueryType(QueryConstants.QueryType.EQUALS);
-                            parsedQuery.setQuery(buildEqualsQuery(dataContext, assignmentValue, splitQueryString.get(0)));
                             break;
                     }
+
+                    //set the assignment value
+                    String assignmentValue = splitQueryString.get(2);
+
+                    parsedQuery.setField(splitQueryString.get(0));
+                    parsedQuery.values.add(assignmentValue);
+                    parsedQuery.setQuery(buildEqualsQuery(dataContext, assignmentValue, splitQueryString.get(0)));
                 }
             }
         }
