@@ -103,7 +103,7 @@ public class DriverOrdersListAdapter extends BaseAdapter {
 
         StringBuilder orderInformationBuilder = new StringBuilder();
         orderInformationBuilder.append("Order #: ");
-        orderInformationBuilder.append(order.getOrderId());
+        orderInformationBuilder.append(order.getKey());
         orderInformationBuilder.append(", ");
         orderInformationBuilder.append("# Items: ");
         orderInformationBuilder.append(order.getItems().size());

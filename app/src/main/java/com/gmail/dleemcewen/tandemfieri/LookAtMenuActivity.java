@@ -36,6 +36,7 @@ public class LookAtMenuActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle = this.getIntent().getExtras();
         restaurant = (Restaurant) bundle.getSerializable("Restaurant");
+        restaurant.setKey(bundle.getString("RestaurantKey"));
         int i = 0, j = 0;
 
         allItems = new ArrayList<>();

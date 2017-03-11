@@ -52,44 +52,6 @@ public abstract class Repository<T extends Entity> {
         this.context = context;
         this.childClass = getChildClassType();
         searchNodes = new ArrayList<>();
-
-        dataContext = getDataContext(childClass.getSimpleName());
-        dataContext.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Entity childEntityRecord = dataSnapshot.getValue(childClass);
-                childEntityRecord.setKey(dataSnapshot.getKey());
-
-                /*Intent intent = new Intent(context, NotificationService.class);
-                intent.setAction(NotificationConstants.Action.ADDED.toString());
-                intent.putExtra("notificationClass", childEntityRecord.getClass());
-                intent.putExtra("entity", (Serializable) childEntityRecord);
-                intent.putExtra("key", childEntityRecord.getKey());
-                context.startService(intent);*/
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Entity childEntityRecord = dataSnapshot.getValue(childClass);
-                childEntityRecord.setKey(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Entity childEntityRecord = dataSnapshot.getValue(childClass);
-                childEntityRecord.setKey(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                //not implemented
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //TODO
-            }
-        });
     }
 
     /**
@@ -302,7 +264,7 @@ public abstract class Repository<T extends Entity> {
         //no query string was provided - bring back all of the records at the specified node
         return Tasks.<Void>forResult(null)
                 .continueWithTask(new NetworkConnectivityCheckTask(context))
-                .continueWithTask(new GetEntitiesTask<T>(dataContext, childClass))
+                .continueWithTask(new GetEntitiesTask<>(dataContext, childClass))
                 .continueWith(new Continuation<Map.Entry<List<T>, DatabaseError>, TaskResult<T>>() {
                     @Override
                     public TaskResult<T> then(@NonNull Task<Map.Entry<List<T>, DatabaseError>> task) throws Exception {

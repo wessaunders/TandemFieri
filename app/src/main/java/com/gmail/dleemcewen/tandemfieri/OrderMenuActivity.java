@@ -37,6 +37,7 @@ public class OrderMenuActivity extends AppCompatActivity {
 
         menuItems = new ArrayList<>();
         restaurant = (Restaurant) getIntent().getSerializableExtra("Restaurant");
+        restaurant.setKey(getIntent().getStringExtra("RestaurantKey"));
         menuItems.addAll(restaurant.getMenu().getSubItems());
         items = new ArrayList<>();
         expandableListView = (ExpandableListView) findViewById(R.id.menu_items);

@@ -15,7 +15,9 @@ import android.widget.RelativeLayout;
 
 import com.gmail.dleemcewen.tandemfieri.Adapters.DriverOrdersListAdapter;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
+import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Orders;
+import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,6 +35,7 @@ public class DriverOrdersFragment extends DialogFragment{
     private DriverOrdersListAdapter listAdapter;
     private Button closeMyOrders;
     private Orders<Order> ordersRepository;
+    private Restaurants<Restaurant> restaurantsRepository;
 
     /**
      * Default constructor
@@ -60,6 +63,7 @@ public class DriverOrdersFragment extends DialogFragment{
         super.onCreate(savedInstanceState);
 
         ordersRepository = new Orders<>(getActivity());
+        restaurantsRepository = new Restaurants<>(getActivity());
     }
 
     @Override
@@ -122,26 +126,44 @@ public class DriverOrdersFragment extends DialogFragment{
      * retrieve data
      */
     private void retrieveData() {
-        //get all the orders for the restaurant the driver is associated with
-        ordersRepository
-            .find("RestaurantId = '" + restaurantId + "'")
-            .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Order>>() {
-                @Override
-                public void onComplete(@NonNull Task<TaskResult<Order>> task) {
-                    List<Order> restaurantOrders = task.getResult().getResults();
+        //First get the restaurant the driver is associated with
+        restaurantsRepository
+        .find("id = '" + restaurantId + "'")
+        .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Restaurant>>() {
+            @Override
+            public void onComplete(@NonNull Task<TaskResult<Restaurant>> task) {
+                List<Restaurant> restaurants = task.getResult().getResults();
+                String ownerId = "";
 
-                    if (!restaurantOrders.isEmpty()) {
-                        List<Order> driverOrders = new ArrayList<>();
-
-                        //TODO: need way to identify which of these orders should be associated with a driver
-                        //for now, just assign all of them
-                        driverOrders.addAll(restaurantOrders);
-
-                        //bind the orders to the listview
-                        listAdapter = new DriverOrdersListAdapter(getActivity(), driverOrders);
-                        myDeliveriesList.setAdapter(listAdapter);
-                    }
+                if (!restaurants.isEmpty()) {
+                    ownerId = restaurants.get(0).getOwnerId();
                 }
-            });
+
+                //Now with the ownerid we can get all the orders for the restaurant owner
+                //additionally filter them by restaurantid because the order could be for a
+                //restaurant owned by the owner that the driver isn't associated with
+                ordersRepository
+                    .atNode(ownerId)
+                    .find("restaurantId = '" + restaurantId + "'")
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Order>>() {
+                        @Override
+                        public void onComplete(@NonNull Task<TaskResult<Order>> task) {
+                            List<Order> restaurantOrders = task.getResult().getResults();
+
+                            if (!restaurantOrders.isEmpty()) {
+                                List<Order> driverOrders = new ArrayList<>();
+
+                                //TODO: need way to identify which of these orders should be associated with a driver
+                                //for now, just assign all of them
+                                driverOrders.addAll(restaurantOrders);
+
+                                //bind the orders to the listview
+                                listAdapter = new DriverOrdersListAdapter(getActivity(), driverOrders);
+                                myDeliveriesList.setAdapter(listAdapter);
+                            }
+                        }
+                    });
+            }
+        });
     }
 }
