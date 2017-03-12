@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.gmail.dleemcewen.tandemfieri.DriverOrdersFragment;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
-import com.gmail.dleemcewen.tandemfieri.Entities.OrderItem;
 import com.gmail.dleemcewen.tandemfieri.R;
 
 import java.util.List;

@@ -1,7 +1,6 @@
 package com.gmail.dleemcewen.tandemfieri;
 
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,9 +12,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.gmail.dleemcewen.tandemfieri.Adapters.DriverOrdersListAdapter;
+import com.gmail.dleemcewen.tandemfieri.Entities.Delivery;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Enums.OrderEnum;
+import com.gmail.dleemcewen.tandemfieri.Repositories.Deliveries;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Orders;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DriverOrdersFragment extends DialogFragment {
-    private Fragment self;
     private String driverId;
     private String restaurantId;
     private RelativeLayout myDeliveriesLayout;
@@ -36,6 +36,9 @@ public class DriverOrdersFragment extends DialogFragment {
     private Button selectCurrentDelivery;
     private Orders<Order> ordersRepository;
     private Restaurants<Restaurant> restaurantsRepository;
+    private Deliveries<Delivery> deliveriesRepository;
+    private List<Order> driverOrders;
+    private Order currentOrder;
 
     /**
      * Default constructor
@@ -48,6 +51,7 @@ public class DriverOrdersFragment extends DialogFragment {
 
         ordersRepository = new Orders<>(getActivity());
         restaurantsRepository = new Restaurants<>(getActivity());
+        deliveriesRepository = new Deliveries<>(getActivity());
     }
 
     @Override
@@ -82,6 +86,8 @@ public class DriverOrdersFragment extends DialogFragment {
             driverId = getArguments().getString("driverId");
             restaurantId = getArguments().getString("restaurantId");
         }
+
+        driverOrders = new ArrayList<>();
     }
 
     /**
@@ -109,6 +115,25 @@ public class DriverOrdersFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 DriverOrdersFragment.this.dismiss();
+
+                deliveriesRepository
+                    .atNode(driverId)
+                    .find()
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Delivery>>() {
+                        @Override
+                        public void onComplete(@NonNull Task<TaskResult<Delivery>> task) {
+                            List<Delivery> deliveries = task.getResult().getResults();
+                            for (Delivery delivery : deliveries) {
+                                if (delivery.getCustomerId().equals(currentOrder.getCustomerId())) {
+                                    delivery.setIsCurrentOrder(true);
+                                } else {
+                                    delivery.setIsCurrentOrder(false);
+                                }
+
+                                deliveriesRepository.update(delivery);
+                            }
+                        }
+                    });
             }
         });
 
@@ -144,7 +169,7 @@ public class DriverOrdersFragment extends DialogFragment {
                             List<Order> restaurantOrders = task.getResult().getResults();
 
                             if (!restaurantOrders.isEmpty()) {
-                                List<Order> driverOrders = new ArrayList<>();
+                                driverOrders.clear();
 
                                 for (Order restaurantOrder : restaurantOrders) {
                                     if (restaurantOrder.getStatus() != OrderEnum.COMPLETE) {
@@ -171,5 +196,6 @@ public class DriverOrdersFragment extends DialogFragment {
     public void setSelectedIndex(int index) {
         listAdapter.setSelectedIndex(index);
         listAdapter.notifyDataSetChanged();
+        currentOrder = driverOrders.get(index);
     }
 }
