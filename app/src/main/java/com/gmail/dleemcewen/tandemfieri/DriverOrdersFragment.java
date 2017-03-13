@@ -130,7 +130,9 @@ public class DriverOrdersFragment extends DialogFragment {
                                     delivery.setIsCurrentOrder(false);
                                 }
 
-                                deliveriesRepository.update(delivery);
+                                deliveriesRepository
+                                    .atNode(driverId)
+                                    .update(delivery);
                             }
                         }
                     });

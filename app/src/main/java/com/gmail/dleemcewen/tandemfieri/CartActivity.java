@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.gmail.dleemcewen.tandemfieri.Adapters.OrderItemAdapter;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
+import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -19,6 +20,7 @@ import java.text.NumberFormat;
 
 public class CartActivity extends AppCompatActivity {
 
+    User user;
     private Order order;
     private Button cancelButton, checkoutButton;
     private double deliveryCharge;
@@ -28,6 +30,7 @@ public class CartActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private String uid = "", ownerId = "", restaurantId = "";
     private FirebaseUser fireuser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
