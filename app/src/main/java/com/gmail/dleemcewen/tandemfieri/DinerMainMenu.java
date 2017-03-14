@@ -162,8 +162,9 @@ public class DinerMainMenu extends AppCompatActivity {
         //need to send user type so that the user can be located in the database
         Bundle dinerBundle = new Bundle();
         Intent intent = new Intent(DinerMainMenu.this, DinerMapActivity.class);
-        dinerBundle.putSerializable("User", user);
-        intent.putExtras(dinerBundle);
+        Bundle userBundle = new Bundle();
+        userBundle.putSerializable("User", user);
+        intent.putExtras(userBundle);
         startActivity(intent);
     }
 
@@ -171,8 +172,9 @@ public class DinerMainMenu extends AppCompatActivity {
         //need to send user type so that the user can be located in the database
         Bundle dinerBundle = new Bundle();
         Intent intent = new Intent(DinerMainMenu.this, DeliveryMapActivity.class);
-        dinerBundle.putSerializable("User", user);
-        intent.putExtras(dinerBundle);
+        Bundle userBundle = new Bundle();
+        userBundle.putSerializable("User", user);
+        intent.putExtras(userBundle);
         startActivity(intent);
     }
 
