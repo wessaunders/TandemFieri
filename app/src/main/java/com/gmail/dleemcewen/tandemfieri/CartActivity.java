@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -35,7 +36,7 @@ public class CartActivity extends AppCompatActivity {
     private OrderItemAdapter orderItemAdapter;
     private TextView total, subtotal, tax;
     private DatabaseReference mDatabase;
-    private String uid = "", ownerId = "", restaurantId = "";
+    private String uid = "", ownerId = "", restaurantId = "", restName = "";
     private FirebaseUser fireuser;
     private NotificationMessages<NotificationMessage> notificationsRepository;
 
@@ -47,6 +48,7 @@ public class CartActivity extends AppCompatActivity {
         restaurantId = (String) getIntent().getSerializableExtra("restaurantId");
         ownerId = (String) getIntent().getSerializableExtra("ownerId");
         deliveryCharge = (double) getIntent().getSerializableExtra("deliveryCharge");
+        restName = (String) getIntent().getSerializableExtra("restaurantName");
         notificationsRepository = new NotificationMessages<>(CartActivity.this);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -81,6 +83,7 @@ public class CartActivity extends AppCompatActivity {
         order.getKey();
         order.setCustomerId(uid);
         order.setRestaurantId(restaurantId);
+        order.setRestaurantName(restName);
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,10 +117,18 @@ public class CartActivity extends AppCompatActivity {
                         }
                     });
 
+                //enable delivery map option in main menu
+                enableDeliveryMap();
+
                 finish();
             }
         });
 
         cartItems.setAdapter(orderItemAdapter);
+    }
+
+    private void enableDeliveryMap(){
+        MenuItem item = DinerMainMenu.getDeliveryMenuItem();
+        item.setVisible(true);
     }
 }

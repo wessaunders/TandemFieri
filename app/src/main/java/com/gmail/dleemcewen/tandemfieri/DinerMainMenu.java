@@ -44,6 +44,7 @@ public class DinerMainMenu extends AppCompatActivity {
     ListView listview;
     List<Restaurant> restaurantsList;
     DatabaseReference mDatabase;
+    static MenuItem deliveryOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +87,11 @@ public class DinerMainMenu extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.diner_menu, menu);
+        deliveryOption = menu.findItem(R.id.delivery);
         return true;
     }
+
+    public static MenuItem getDeliveryMenuItem(){return deliveryOption;}
 
     //determine which menu option was selected and call that option's action method
     @Override
@@ -109,6 +113,9 @@ public class DinerMainMenu extends AppCompatActivity {
             case R.id.delivery:
                 launchDelivery();
                 return true;
+            case R.id.order_history:
+                displayOrderHistory();
+                return true;
             case R.id.payment:
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("User", user);
@@ -124,6 +131,14 @@ public class DinerMainMenu extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void displayOrderHistory(){
+        Bundle dinerBundle = new Bundle();
+        Intent intent = new Intent(DinerMainMenu.this, DinerOrderHistoryActivity.class);
+        dinerBundle.putSerializable("User", user);
+        intent.putExtras(dinerBundle);
+        startActivity(intent);
     }
 
     //called when user selects sign out from the drop down menu
@@ -251,7 +266,7 @@ public class DinerMainMenu extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    //everything to do with restaurant list coode here
+                    //everything to do with restaurant list code here
                     for (DataSnapshot child : dataSnapshot.getChildren()) {
                         Restaurant r = child.getValue(Restaurant.class);
                         if(restaurantNearby(r)) {
