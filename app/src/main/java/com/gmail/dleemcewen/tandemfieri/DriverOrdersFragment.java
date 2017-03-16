@@ -14,14 +14,13 @@ import android.widget.RelativeLayout;
 import com.gmail.dleemcewen.tandemfieri.Adapters.DriverOrdersListAdapter;
 import com.gmail.dleemcewen.tandemfieri.Entities.Delivery;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
-import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Enums.OrderEnum;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Deliveries;
-import com.gmail.dleemcewen.tandemfieri.Repositories.Orders;
-import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +33,6 @@ public class DriverOrdersFragment extends DialogFragment {
     private DriverOrdersListAdapter listAdapter;
     private Button closeMyOrders;
     private Button selectCurrentDelivery;
-    private Orders<Order> ordersRepository;
-    private Restaurants<Restaurant> restaurantsRepository;
     private Deliveries<Delivery> deliveriesRepository;
     private List<Order> driverOrders;
     private Order currentOrder;
@@ -49,8 +46,6 @@ public class DriverOrdersFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ordersRepository = new Orders<>(getActivity());
-        restaurantsRepository = new Restaurants<>(getActivity());
         deliveriesRepository = new Deliveries<>(getActivity());
     }
 
@@ -116,24 +111,12 @@ public class DriverOrdersFragment extends DialogFragment {
             public void onClick(View v) {
                 DriverOrdersFragment.this.dismiss();
 
-                deliveriesRepository
-                    .atNode(driverId)
-                    .find()
-                    .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Delivery>>() {
-                        @Override
-                        public void onComplete(@NonNull Task<TaskResult<Delivery>> task) {
-                            List<Delivery> deliveries = task.getResult().getResults();
-                            if (!deliveries.isEmpty()) {
-                                Delivery delivery = deliveries.get(0);
-
-                                delivery.setCurrentOrderId(currentOrder.getCustomerId());
-                                delivery.setKey(driverId);
-
-                                deliveriesRepository
-                                    .update(delivery);
-                            }
-                        }
-                    });
+                FirebaseDatabase
+                    .getInstance()
+                    .getReference(Delivery.class.getSimpleName())
+                    .child(driverId)
+                    .child("currentOrderId")
+                    .setValue(currentOrder.getCustomerId());
             }
         });
     }
@@ -142,18 +125,20 @@ public class DriverOrdersFragment extends DialogFragment {
      * retrieve data
      */
     private void retrieveData() {
-        deliveriesRepository
+        deliveriesRepository = (Deliveries<Delivery>)deliveriesRepository
             .atNode(driverId)
-            .atNode("Order")
-            .find("status != '" + OrderEnum.COMPLETE.toString() + "'")
-            .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Delivery>>() {
+            .atNode("Order");
+
+        deliveriesRepository
+            .findOrders("status != '" + OrderEnum.COMPLETE.toString() + "'")
+            .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Order>>() {
                 @Override
-                public void onComplete(@NonNull Task<TaskResult<Delivery>> task) {
-                    List<Delivery> deliveries = task.getResult().getResults();
+                public void onComplete(@NonNull Task<TaskResult<Order>> task) {
+                    List<Order> orders = task.getResult().getResults();
                     driverOrders.clear();
 
-                    if (!deliveries.isEmpty()) {
-                        driverOrders.addAll(deliveries.get(0).getOrders());
+                    if (!orders.isEmpty()) {
+                        driverOrders.addAll(orders);
                     }
 
                     //bind the orders to the listview

@@ -10,7 +10,7 @@ import java.util.List;
  */
 
 public class Delivery extends Entity implements Serializable {
-    private List<Order> orders;
+    private List<Order> order;
     private String currentOrderId;
 
     /**
@@ -20,19 +20,19 @@ public class Delivery extends Entity implements Serializable {
     }
 
     /**
-     * getOrders returns the orders associated with the delivery
-     * @return orders associated with the delivery
+     * getOrder returns the orders associated with the delivery
+     * @return order associated with the delivery
      */
-    public List<Order> getOrders() {
-        return orders;
+    public List<Order> getOrder() {
+        return order;
     }
 
     /**
-     * setOrders sets the orders associated with the delivery
-     * @param orders indicates the orders associated with the delivery
+     * setOrder sets the orders associated with the delivery
+     * @param order indicates the orders associated with the delivery
      */
-    public void setOrder(List<Order> orders) {
-        this.orders = orders;
+    public void setOrder(List<Order> order) {
+        this.order = order;
     }
 
     /**
