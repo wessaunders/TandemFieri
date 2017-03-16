@@ -102,9 +102,9 @@ public class CartActivity extends AppCompatActivity {
                 //sent order notification to restaurant
                 notificationsRepository
                     .sendNotification(NotificationConstants.Action.ADDED, order)
-                    .addOnCompleteListener(CartActivity.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
+                    .addOnCompleteListener(CartActivity.this, new OnCompleteListener<TaskResult<Order>>() {
                         @Override
-                        public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
+                        public void onComplete(@NonNull Task<TaskResult<Order>> task) {
                             if (task.isSuccessful()) {
                                 Toast
                                     .makeText(CartActivity.this, "Your order has been placed successfully.", Toast.LENGTH_LONG)

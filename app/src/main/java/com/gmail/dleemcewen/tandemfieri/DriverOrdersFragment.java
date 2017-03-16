@@ -84,7 +84,7 @@ public class DriverOrdersFragment extends DialogFragment {
     private void initialize(View view) {
         if (getArguments() != null) {
             driverId = getArguments().getString("driverId");
-            restaurantId = getArguments().getString("restaurantId");
+            //restaurantId = getArguments().getString("restaurantId");
         }
 
         driverOrders = new ArrayList<>();
@@ -126,7 +126,7 @@ public class DriverOrdersFragment extends DialogFragment {
                             if (!deliveries.isEmpty()) {
                                 Delivery delivery = deliveries.get(0);
 
-                                delivery.setCurrentOrderId(currentOrder.getKey());
+                                delivery.setCurrentOrderId(currentOrder.getCustomerId());
                                 delivery.setKey(driverId);
 
                                 deliveriesRepository
@@ -136,54 +136,31 @@ public class DriverOrdersFragment extends DialogFragment {
                     });
             }
         });
-
     }
 
     /**
      * retrieve data
      */
     private void retrieveData() {
-        //First get the restaurant the driver is associated with
-        restaurantsRepository
-        .find("id = '" + restaurantId + "'")
-        .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Restaurant>>() {
-            @Override
-            public void onComplete(@NonNull Task<TaskResult<Restaurant>> task) {
-                List<Restaurant> restaurants = task.getResult().getResults();
-                String ownerId = "";
+        deliveriesRepository
+            .atNode(driverId)
+            .atNode("Order")
+            .find("status != '" + OrderEnum.COMPLETE.toString() + "'")
+            .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Delivery>>() {
+                @Override
+                public void onComplete(@NonNull Task<TaskResult<Delivery>> task) {
+                    List<Delivery> deliveries = task.getResult().getResults();
+                    driverOrders.clear();
 
-                if (!restaurants.isEmpty()) {
-                    ownerId = restaurants.get(0).getOwnerId();
+                    if (!deliveries.isEmpty()) {
+                        driverOrders.addAll(deliveries.get(0).getOrders());
+                    }
+
+                    //bind the orders to the listview
+                    listAdapter = new DriverOrdersListAdapter(getActivity(), DriverOrdersFragment.this, driverOrders);
+                    myDeliveriesList.setAdapter(listAdapter);
                 }
-
-                //Now with the ownerid we can get all the orders for the restaurant owner
-                //additionally filter them by restaurantid because the order could be for a
-                //restaurant owned by the owner that the driver isn't associated with
-                //also ensure that the order isn't already complete
-                ordersRepository
-                    .atNode(ownerId)
-                    .atNode(restaurantId)
-                    .find("status != '" + OrderEnum.COMPLETE.toString() + "'")
-                    .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Order>>() {
-                        @Override
-                        public void onComplete(@NonNull Task<TaskResult<Order>> task) {
-                            List<Order> restaurantOrders = task.getResult().getResults();
-
-                            if (!restaurantOrders.isEmpty()) {
-                                driverOrders.clear();
-
-                                //TODO: need way to identify which of these orders should be associated with a driver
-                                //for now, just assign all of them
-                                driverOrders.addAll(restaurantOrders);
-
-                                //bind the orders to the listview
-                                listAdapter = new DriverOrdersListAdapter(getActivity(), DriverOrdersFragment.this, driverOrders);
-                                myDeliveriesList.setAdapter(listAdapter);
-                            }
-                        }
-                    });
-            }
-        });
+            });
     }
 
     /**
