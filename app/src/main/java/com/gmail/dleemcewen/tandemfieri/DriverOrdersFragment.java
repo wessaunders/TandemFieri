@@ -123,16 +123,14 @@ public class DriverOrdersFragment extends DialogFragment {
                         @Override
                         public void onComplete(@NonNull Task<TaskResult<Delivery>> task) {
                             List<Delivery> deliveries = task.getResult().getResults();
-                            for (Delivery delivery : deliveries) {
-                                if (delivery.getCustomerId().equals(currentOrder.getCustomerId())) {
-                                    delivery.setIsCurrentOrder(true);
-                                } else {
-                                    delivery.setIsCurrentOrder(false);
-                                }
+                            if (!deliveries.isEmpty()) {
+                                Delivery delivery = deliveries.get(0);
+
+                                delivery.setCurrentOrderId(currentOrder.getKey());
+                                delivery.setKey(driverId);
 
                                 deliveriesRepository
-                                        .atNode(driverId)
-                                        .update(delivery);
+                                    .update(delivery);
                             }
                         }
                     });
