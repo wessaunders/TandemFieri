@@ -53,4 +53,5 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/button_text_size"
         android:text="@string/manageOrders"/>
+
 </LinearLayout>

@@ -1,4 +1,5 @@
 <resources>
+    <string name="productHistory">Product History</string>
     <string name="minimum_logging_level">FINE</string>
     <string name="purchase">Purchase</string>
     <string name="app_name">Tandem Fieri</string>
@@ -17,6 +18,8 @@
     <string name="hintAddress">Address</string>
     <string name="hintCity">City</string>
     <string name="hintState">State</string>
+    <string name="hintCategories">Categories</string>
+    <string name="removeItem">To remove an item from your order, long press on the item.</string>
     <string name="hintZip">Zip</string>
     <string name="hintPhone">Phone Number</string>
     <string name="nextButton">Next</string>
