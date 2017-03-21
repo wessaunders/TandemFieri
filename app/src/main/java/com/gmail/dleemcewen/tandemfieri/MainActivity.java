@@ -21,6 +21,7 @@ import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.gmail.dleemcewen.tandemfieri.Logging.ToastLogger;
 import com.gmail.dleemcewen.tandemfieri.Publishers.NotificationPublisher;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
+import com.gmail.dleemcewen.tandemfieri.Subscribers.DinerSubscriber;
 import com.gmail.dleemcewen.tandemfieri.Subscribers.RestaurantSubscriber;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
 import com.gmail.dleemcewen.tandemfieri.Utility.BraintreeUtil;
@@ -252,6 +253,15 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = null;
 
         if(diner != null){
+            List<Object> customerIds = new ArrayList<>();
+            customerIds.add(diner.getAuthUserID());
+
+            //register new diner subscriber
+            registerNewSubscriber(new DinerSubscriber(
+                    MainActivity.this,
+                    diner,
+                    new AbstractMap.SimpleEntry<>("customerId", customerIds)));
+
             intent = new Intent(MainActivity.this, DinerMainMenu.class);
             bundle.putSerializable("User", diner);
 

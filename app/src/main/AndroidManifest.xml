@@ -76,7 +76,14 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".DinerOrderHistoryActivity" />
         <activity android:name=".ViewOrderActivity" />
-        <activity android:name=".ProductHistoryActivity"></activity>
+        <activity android:name=".ProductHistoryActivity" />
+        <activity android:name=".DriverRatingActivity"
+            android:parentActivityName="com.gmail.dleemcewen.tandemfieri.DinerMainMenu" >
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gmail.dleemcewen.tandemfieri.DinerMainMenu" />
+        </activity>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.gmail.dleemcewen.tandemfieri;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -7,6 +8,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,10 +21,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.gmail.dleemcewen.tandemfieri.Entities.NotificationMessage;
+import com.gmail.dleemcewen.tandemfieri.Entities.Order;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
+import com.gmail.dleemcewen.tandemfieri.Repositories.NotificationMessages;
+import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -40,6 +49,7 @@ import static android.os.Build.VERSION_CODES.M;
 import static com.gmail.dleemcewen.tandemfieri.DinerMapActivity.MY_PERMISSIONS_REQUEST_LOCATION;
 
 public class DinerMainMenu extends AppCompatActivity {
+    private NotificationMessages<NotificationMessage> notificationsRepository;
     User user;
     ListView listview;
     List<Restaurant> restaurantsList;
@@ -54,15 +64,34 @@ public class DinerMainMenu extends AppCompatActivity {
         getHandles();
         initialize();
         retrieveData();
+        resendExistingDinerNotifications();
 
         LogWriter.log(getApplicationContext(), Level.INFO, "The user is " + user.getEmail());
     }//end onCreate
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (notificationsRepository == null) {
+            notificationsRepository = new NotificationMessages<>(DinerMainMenu.this);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        notificationsRepository.finalize();
+        notificationsRepository = null;
+    }
 
     private void getHandles(){
         listview = (ListView) findViewById(R.id.diner_listview);
     }
 
     private void initialize(){
+        notificationsRepository = new NotificationMessages<>(DinerMainMenu.this);
+
         Bundle bundle = this.getIntent().getExtras();
         user = (User) bundle.getSerializable("User");
         restaurantsList = new ArrayList<>();
@@ -72,6 +101,30 @@ public class DinerMainMenu extends AppCompatActivity {
                 openMenu((Restaurant) parent.getItemAtPosition(position));
             }
         });
+    }
+
+    /**
+     * resendExistingDinerNotifications re-sends existing diner notifications that are notifications
+     * for the current diner
+     */
+    private void resendExistingDinerNotifications() {
+        notificationsRepository
+            .find("notificationType = 'Order'")
+            .addOnCompleteListener(DinerMainMenu.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
+                @Override
+                public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
+                    List<NotificationMessage> messages = task.getResult().getResults();
+                    if (!messages.isEmpty()) {
+                        for (NotificationMessage message : messages) {
+                            HashMap data = (HashMap)message.getData();
+
+                            if (data.get("customerId").equals(user.getAuthUserID())) {
+                                notificationsRepository.resendNotification(message);
+                            }
+                        }
+                    }
+                }
+            });
     }
 
     private void openMenu(Restaurant r){
