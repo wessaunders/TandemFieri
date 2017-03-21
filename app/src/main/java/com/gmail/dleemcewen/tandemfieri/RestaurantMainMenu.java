@@ -248,12 +248,12 @@ public class RestaurantMainMenu extends AppCompatActivity {
         return childData;
     }
 
-    //@Override
-   /* public void onResume() {
+    @Override
+    public void onResume() {
         super.onResume();  // Always call the superclass method first
 
-        //retrieveData();
-    }*/
+        retrieveData();
+    }
 
 
 }//end Activity
