@@ -11,6 +11,7 @@ import android.support.v7.app.NotificationCompat;
 import com.gmail.dleemcewen.tandemfieri.DinerMainMenu;
 import com.gmail.dleemcewen.tandemfieri.DriverRatingActivity;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
+import com.gmail.dleemcewen.tandemfieri.Filters.SubscriberFilter;
 import com.gmail.dleemcewen.tandemfieri.Interfaces.ISubscriber;
 import com.gmail.dleemcewen.tandemfieri.R;
 
@@ -26,7 +27,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class DinerSubscriber implements ISubscriber {
     private Context context;
-    private Map.Entry<String, List<Object>> filter;
+    private List<SubscriberFilter> filters;
     private User dinerUser;
     private static final String notificationType = "Order";
 
@@ -34,12 +35,12 @@ public class DinerSubscriber implements ISubscriber {
      * Default constructor
      * @param context indicates the current application context
      * @param dinerUser identifies the diner user
-     * @param filter indicates the record filter supplied by the subscriber
+     * @param filters indicates the record filters supplied by the subscriber
      */
-    public DinerSubscriber(Context context, User dinerUser, Map.Entry<String, List<Object>> filter) {
+    public DinerSubscriber(Context context, User dinerUser, List<SubscriberFilter> filters) {
         this.context = context;
         this.dinerUser = dinerUser;
-        this.filter = filter;
+        this.filters = filters;
     }
 
     /**
@@ -48,7 +49,7 @@ public class DinerSubscriber implements ISubscriber {
      */
     public DinerSubscriber(Context context) {
         this.context = context;
-        this.filter = null;
+        this.filters = null;
     }
 
     @Override
@@ -57,8 +58,8 @@ public class DinerSubscriber implements ISubscriber {
     }
 
     @Override
-    public Map.Entry<String, List<Object>> getFilter() {
-        return filter;
+    public List<SubscriberFilter> getFilters() {
+        return filters;
     }
 
     @Override
@@ -79,37 +80,50 @@ public class DinerSubscriber implements ISubscriber {
             //set an id for the notification
             int notificationId = Integer.valueOf(notificationData.get("notificationId").toString());
 
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("User", dinerUser);
-            bundle.putInt("notificationId", notificationId);
+            Bundle rateDriverBundle = new Bundle();
+            rateDriverBundle.putSerializable("User", dinerUser);
+            rateDriverBundle.putInt("notificationId", notificationId);
 
-            Intent resultIntent = new Intent(context, DriverRatingActivity.class);
-            resultIntent.putExtras(bundle);
-            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Intent ratingIntent = new Intent(context, DinerMainMenu.class);
+            ratingIntent.putExtras(rateDriverBundle);
+            ratingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            TaskStackBuilder backStackBuilder = TaskStackBuilder.create(context);
-            backStackBuilder.addNextIntentWithParentStack(resultIntent);
-            Intent dinerMainMenuIntent = backStackBuilder.editIntentAt(0);
-            bundle.putSerializable("User", dinerUser);
-            dinerMainMenuIntent.putExtras(bundle);
+            Bundle cancelRatingBundle = new Bundle();
+            cancelRatingBundle.putSerializable("User", dinerUser);
+            cancelRatingBundle.putInt("notificationId", notificationId);
+            cancelRatingBundle.putBoolean("skipRating", true);
 
-            // Use TaskStackBuilder to build the back stack and get the PendingIntent
-            PendingIntent resultPendingIntent = backStackBuilder
-                            .getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
+            Intent cancelIntent = new Intent(context, DinerMainMenu.class);
+            cancelIntent.putExtras(cancelRatingBundle);
+            cancelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            TaskStackBuilder cancelBackStackBuilder = TaskStackBuilder.create(context);
+            cancelBackStackBuilder.addNextIntentWithParentStack(cancelIntent);
+
+            PendingIntent cancelNotificationPendingIntent = cancelBackStackBuilder
+                    .getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            TaskStackBuilder ratingBackStackBuilder = TaskStackBuilder.create(context);
+            ratingBackStackBuilder.addNextIntentWithParentStack(ratingIntent);
+
+            PendingIntent resultPendingIntent = ratingBackStackBuilder
+                    .getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
 
             // Build notification
             NotificationCompat.Builder notificationBuilder =
-                    (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                            .setSmallIcon(R.drawable.ic_mail_outline)
-                            .setContentTitle(notificationType + " notification message")
-                            .setContentText(contentTextBuilder.toString())
-                            .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationTextBuilder.toString()))
-                            .addAction(R.drawable.ic_open_in_new, "No thanks", resultPendingIntent)
-                            .addAction(R.drawable.ic_open_in_new, "Rate your driver", resultPendingIntent);
+                (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.ic_mail_outline)
+                    .setContentTitle(notificationType + " notification message")
+                    .setContentText(contentTextBuilder.toString())
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationTextBuilder.toString()))
+                    .addAction(R.drawable.ic_open_in_new, "No thanks", cancelNotificationPendingIntent)
+                    .addAction(R.drawable.ic_open_in_new, "Rate your driver", resultPendingIntent);
 
             // This sets the pending intent that should be fired when the user clicks the
             // notification. Clicking the notification launches a new activity.
-            notificationBuilder.setContentIntent(resultPendingIntent);
+            notificationBuilder
+                .setDeleteIntent(cancelNotificationPendingIntent)
+                .setContentIntent(resultPendingIntent);
 
             // Gets an instance of the NotificationManager service
             NotificationManager notificationManager =
@@ -118,6 +132,5 @@ public class DinerSubscriber implements ISubscriber {
             // Builds the notification and issues it.
             notificationManager.notify(notificationId, notificationBuilder.build());
         }
-
     }
 }

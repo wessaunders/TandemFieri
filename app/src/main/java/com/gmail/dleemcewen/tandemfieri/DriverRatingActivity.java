@@ -82,8 +82,8 @@ public class DriverRatingActivity extends AppCompatActivity {
     private void findControlReferences() {
         driverRatingBar = (RatingBar)findViewById(R.id.driverRatingBar);
         driverRatingText = (TextView)findViewById(R.id.driverRatingText);
-        cancelDriverRating = (Button)findViewById(R.id.cancelDriverRating);
-        saveDriverRating = (Button)findViewById(R.id.saveDriverRating);
+        //cancelDriverRating = (Button)findViewById(R.id.cancelDriverRating);
+        //saveDriverRating = (Button)findViewById(R.id.saveDriverRating);
     }
 
     /**
@@ -97,7 +97,7 @@ public class DriverRatingActivity extends AppCompatActivity {
             }
         });
 
-        cancelDriverRating.setOnClickListener(new View.OnClickListener() {
+        /*cancelDriverRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -118,7 +118,7 @@ public class DriverRatingActivity extends AppCompatActivity {
 
                 finish();
             }
-        });
+        });*/
     }
 
     /**
