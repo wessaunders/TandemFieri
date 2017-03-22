@@ -105,7 +105,7 @@ public class DinerSubscriber implements ISubscriber {
             ratingBackStackBuilder.addNextIntentWithParentStack(ratingIntent);
 
             PendingIntent resultPendingIntent = ratingBackStackBuilder
-                    .getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
+                    .getPendingIntent(1, PendingIntent.FLAG_CANCEL_CURRENT);
 
             // Build notification
             NotificationCompat.Builder notificationBuilder =
@@ -114,7 +114,8 @@ public class DinerSubscriber implements ISubscriber {
                     .setContentTitle(notificationType + " notification message")
                     .setContentText(contentTextBuilder.toString())
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationTextBuilder.toString()))
-                    .addAction(R.drawable.ic_open_in_new, "No thanks", cancelNotificationPendingIntent)
+                    .setAutoCancel(false)
+                    .addAction(R.drawable.ic_remove, "No thanks", cancelNotificationPendingIntent)
                     .addAction(R.drawable.ic_open_in_new, "Rate your driver", resultPendingIntent);
 
             // This sets the pending intent that should be fired when the user clicks the

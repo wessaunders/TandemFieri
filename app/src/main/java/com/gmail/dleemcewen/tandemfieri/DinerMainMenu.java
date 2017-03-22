@@ -249,29 +249,36 @@ public class DinerMainMenu extends AppCompatActivity {
      * getNotificationOrderDataToDisplayForDriverRating gets the order data from the notification to use
      * to be able to display and collect a driver rating
      */
-    private void getNotificationOrderDataToDisplayForDriverRating(int notificationId, boolean skipRating) {
+    private void getNotificationOrderDataToDisplayForDriverRating(final int notificationId, final boolean skipRating) {
         if (notificationId != 0) {
             NotificationManager notificationManager =
                     (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
 
             notificationManager.cancel(notificationId);
 
-            if (!skipRating) {
-                notificationsRepository
-                        .find("notificationId = '" + notificationId + "'")
-                        .addOnCompleteListener(DinerMainMenu.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
-                            @Override
-                            public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
-                                List<NotificationMessage> messages = task.getResult().getResults();
-                                if (!messages.isEmpty()) {
-                                    HashMap orderData = (HashMap) messages.get(0).getData();
-                                    notificationsRepository.remove(messages.get(0));
+            //run notification query
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    notificationsRepository
+                            .find("notificationId = '" + notificationId + "'")
+                            .addOnCompleteListener(DinerMainMenu.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
+                                @Override
+                                public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
+                                    List<NotificationMessage> messages = task.getResult().getResults();
+                                    if (!messages.isEmpty()) {
+                                        notificationsRepository.remove(messages.get(0));
 
-                                    showDriverRatingDialog(orderData);
+                                        if (!skipRating) {
+                                            HashMap orderData = (HashMap) messages.get(0).getData();
+                                            showDriverRatingDialog(orderData);
+                                        }
+                                    }
                                 }
-                            }
-                        });
-            }
+                            });
+
+                }
+            }).start();
         }
     }
 
@@ -345,24 +352,29 @@ public class DinerMainMenu extends AppCompatActivity {
         //no need to sent notifications if we are actually arriving at the dinermainmenu
         //from a notification
         if (notificationId == 0) {
-            notificationsRepository
-                    .find("notificationType = 'Order'")
-                    .addOnCompleteListener(DinerMainMenu.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
-                        @Override
-                        public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
-                            List<NotificationMessage> messages = task.getResult().getResults();
-                            if (!messages.isEmpty()) {
-                                for (NotificationMessage message : messages) {
-                                    HashMap data = (HashMap)message.getData();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    notificationsRepository
+                        .find("notificationType = 'Order'")
+                        .addOnCompleteListener(DinerMainMenu.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
+                            @Override
+                            public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
+                                List<NotificationMessage> messages = task.getResult().getResults();
+                                if (!messages.isEmpty()) {
+                                    for (NotificationMessage message : messages) {
+                                        HashMap data = (HashMap)message.getData();
 
-                                    if (data.get("customerId").equals(user.getAuthUserID())
-                                            && data.get("status").equals(OrderEnum.COMPLETE.toString())) {
-                                        notificationsRepository.resendNotification(message);
+                                        if (data.get("customerId").equals(user.getAuthUserID())
+                                                && data.get("status").equals(OrderEnum.COMPLETE.toString())) {
+                                            notificationsRepository.resendNotification(message);
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        });
+                }
+            }).start();
         }
     }
 
