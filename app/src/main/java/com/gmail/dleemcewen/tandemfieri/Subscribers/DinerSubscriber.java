@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 
 import com.gmail.dleemcewen.tandemfieri.DinerMainMenu;
-import com.gmail.dleemcewen.tandemfieri.DriverRatingActivity;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Filters.SubscriberFilter;
 import com.gmail.dleemcewen.tandemfieri.Interfaces.ISubscriber;
@@ -17,7 +16,6 @@ import com.gmail.dleemcewen.tandemfieri.R;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
