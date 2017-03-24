@@ -78,8 +78,10 @@ public class ManageOrders extends AppCompatActivity {
 
                         controlBool = true;
                         User user2 = (User) logicList.get(i);
-                        mDatabase.child("Delivery").child(user2.getAuthUserID()).child("Order").child(order.getCustomerId()).removeValue();
-                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).setValue(order);
+                        mDatabase.child("Delivery").child(user2.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).removeValue();
+                        mDatabase.child("Delivery").child(user2.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).child("OwnerId").removeValue();
+                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).setValue(order);
+                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).child("OwnerId").setValue(owner.getAuthUserID());
 
                     }
                 }
@@ -87,12 +89,14 @@ public class ManageOrders extends AppCompatActivity {
 
                 if(controlBool == false) {
                     if (temp.contains(" | Assigned To")) {
-                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).removeValue();
+                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).removeValue();
                         mDatabase.child("Order").child(owner.getAuthUserID()).child(order.getOrderId()).child("Assigned").removeValue();
+                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).child("OwnerId").removeValue();
                     } else {
 
                         Toast.makeText(getApplicationContext(), "Sent the order to " + user.getFirstName(), Toast.LENGTH_LONG).show();
-                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).setValue(order);
+                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).setValue(order);
+                        mDatabase.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).child("OwnerId").setValue(owner.getAuthUserID());
                         mDatabase.child("Order").child(owner.getAuthUserID()).child(order.getOrderId()).child("Assigned").setValue("True");
                     }
                 }
@@ -123,7 +127,7 @@ public class ManageOrders extends AppCompatActivity {
                         //Toast.makeText(getApplicationContext(), child.child("firstName").getValue().toString(), Toast.LENGTH_LONG).show();
                         User d = child.getValue(User.class);
 
-                        if (dataSnapshot.child("Delivery").child(d.getAuthUserID()).child("Order").child(order.getCustomerId()).exists()) {
+                        if (dataSnapshot.child("Delivery").child(d.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).exists()) {
                             driverList.add(d.getFirstName() + " " + d.getLastName() + " | Assigned To");
                             logicList.add(d);
                         } else {
