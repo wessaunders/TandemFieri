@@ -15,7 +15,6 @@
         android:id="@+id/restaurant_openclosed"
         android:layout_marginLeft="48dp"
         android:textSize="@dimen/regular_text_size"
-        android:textColor="@android:color/darker_gray"
         android:textStyle="italic"/>
 
 </LinearLayout>

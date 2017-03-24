@@ -2,6 +2,7 @@ package com.gmail.dleemcewen.tandemfieri.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -151,28 +152,44 @@ public class DinerRestaurantsListAdapter extends BaseAdapter {
                 public void onComplete(@NonNull Task<TaskResult<DeliveryHours>> task) {
                     List<DeliveryHours> deliveryHours = task.getResult().getResults();
                     if (!deliveryHours.isEmpty() && !deliveryHours.get(0).getDays().isEmpty()) {
+                        StringBuilder hoursTextBuilder = new StringBuilder();
+
                         Day dayHours = deliveryHours.get(0).getDays().get(dayOfWeek);
                         if (dayHours.isOpen()) {
-                            StringBuilder hoursTextBuilder = new StringBuilder();
-
                             if (compareOpenTimeWithCurrentTime(dayHours.getHourOpen())) {
                                 if (compareClosedTimeWithCurrentTime(dayHours.getHourClosed())) {
-                                    hoursTextBuilder.append("CURRENTLY OPEN, closing at ");
+                                    hoursTextBuilder.append("CURRENTLY OPEN. ");
+                                    hoursTextBuilder.append("Open today from ");
+                                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
+                                    hoursTextBuilder.append(" to ");
                                     hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
-                                    setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed);
+                                    hoursTextBuilder.append(".");
+                                    setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.BLUE);
                                 } else {
-                                    setRestaurantHoursText("CLOSED", restaurantOpenClosed);
+                                    hoursTextBuilder.append("CLOSED. ");
+                                    hoursTextBuilder.append("Open today from ");
+                                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
+                                    hoursTextBuilder.append(" to ");
+                                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
+                                    hoursTextBuilder.append(".");
+                                    setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.argb(255, 128, 128, 128));
                                 }
                             } else {
-                                hoursTextBuilder.append("CURRENTLY CLOSED, opening at ");
+                                hoursTextBuilder.append("CURRENTLY CLOSED. ");
+                                hoursTextBuilder.append("Open today from ");
                                 hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
-                                setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed);
+                                hoursTextBuilder.append(" to ");
+                                hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
+                                hoursTextBuilder.append(".");
+                                setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.argb(255, 128, 128, 128));
                             }
                         } else {
-                            setRestaurantHoursText("CLOSED", restaurantOpenClosed);
+                            hoursTextBuilder.append("CLOSED. ");
+                            hoursTextBuilder.append("Not open today.");
+                            setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.argb(255, 128, 128, 128));
                         }
                     } else {
-                        setRestaurantHoursText("CLOSED", restaurantOpenClosed);
+                        setRestaurantHoursText("CLOSED. No delivery hours have been set for today.", restaurantOpenClosed, Color.argb(255, 128, 128, 128));
                     }
                 }
             });
@@ -204,9 +221,11 @@ public class DinerRestaurantsListAdapter extends BaseAdapter {
      * setRestaurantHoursText sets the restaurant hours text
      * @param hoursText indicates the text to display
      * @param restaurantOpenClosed identifies the textview to update
+     * @param textColor indicates the text color of the restaurant hours
      */
-    private void setRestaurantHoursText(String hoursText, TextView restaurantOpenClosed) {
+    private void setRestaurantHoursText(String hoursText, TextView restaurantOpenClosed, int textColor) {
         restaurantOpenClosed.setText(hoursText);
+        restaurantOpenClosed.setTextColor(textColor);
     }
 
     /**
