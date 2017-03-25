@@ -137,10 +137,10 @@ public class DinerRestaurantsListAdapter extends BaseAdapter {
                 break;
         }
 
-        TextView restaurantOpenClosed = (TextView)convertView.findViewById(R.id.restaurant_openclosed);
+        TextView restaurantOpenClosed = (TextView)convertView.findViewById(R.id.restaurantOpenClosed);
         setRestaurantHours(restaurant.getId(), restaurantOpenClosed);
 
-        TextView restaurantAverageRating = (TextView)convertView.findViewById(R.id.restaurant_average_rating);
+        TextView restaurantAverageRating = (TextView)convertView.findViewById(R.id.restaurantAverageRating);
         getRestaurantAverageRating(restaurant.getId(), restaurantAverageRating);
 
         return convertView;
@@ -316,9 +316,5 @@ public class DinerRestaurantsListAdapter extends BaseAdapter {
             restaurantAverageRating
                 .setText("No ratings yet");
         }
-    }
-
-    private void drawRestaurantRatingStars(Float averageRating, TextView restaurantAverageRating) {
-
     }
 }
