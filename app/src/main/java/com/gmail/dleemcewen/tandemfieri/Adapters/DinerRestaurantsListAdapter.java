@@ -181,28 +181,6 @@ public class DinerRestaurantsListAdapter extends BaseAdapter {
     }
 
     /**
-     * compareOpenTimeWithCurrentTime compares the defined open time with the current time
-     * to determine if the restaurant is currently open
-     * @param hourOpen indicates the time the restaurant opens in military format
-     * @return true or false
-     */
-    private boolean compareOpenTimeWithCurrentTime(int hourOpen) {
-        int currentMilitaryTime = DateFormatter.convertStandardTimeToMilitaryTime(currentDate);
-        return currentMilitaryTime > hourOpen;
-    }
-
-    /**
-     * compareClosedTimeWithCurrentTime compares the defined closed time with the current time
-     * to determine if the restaurant is currently closed
-     * @param hourClosed indicates the time the restaurant closes in military format
-     * @return true or false
-     */
-    private boolean compareClosedTimeWithCurrentTime(int hourClosed) {
-        int currentMilitaryTime = DateFormatter.convertStandardTimeToMilitaryTime(currentDate);
-        return currentMilitaryTime < hourClosed;
-    }
-
-    /**
      * buildRestaurantHoursText builds the restaurant hours text
      * @param dayHours indicates the hours the restaurant is open for each day
      * @param restaurantOpenClosed identifies the textview to update
@@ -211,30 +189,30 @@ public class DinerRestaurantsListAdapter extends BaseAdapter {
         StringBuilder hoursTextBuilder = new StringBuilder();
 
         if (dayHours.isOpen()) {
-            if (compareOpenTimeWithCurrentTime(dayHours.getHourOpen())) {
-                if (compareClosedTimeWithCurrentTime(dayHours.getHourClosed())) {
+            if (dayHours.compareOpenTimeWithCurrentTime(dayHours.getHourOpen(), currentDate)) {
+                if (dayHours.compareClosedTimeWithCurrentTime(dayHours.getHourClosed(), currentDate)) {
                     hoursTextBuilder.append("CURRENTLY OPEN. ");
                     hoursTextBuilder.append("Open today from ");
-                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
+                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourOpen()));
                     hoursTextBuilder.append(" to ");
-                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
+                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourClosed()));
                     hoursTextBuilder.append(".");
                     setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.BLUE);
                 } else {
                     hoursTextBuilder.append("CLOSED. ");
                     hoursTextBuilder.append("Open today from ");
-                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
+                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourOpen()));
                     hoursTextBuilder.append(" to ");
-                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
+                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourClosed()));
                     hoursTextBuilder.append(".");
                     setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.argb(255, 128, 128, 128));
                 }
             } else {
                 hoursTextBuilder.append("CURRENTLY CLOSED. ");
                 hoursTextBuilder.append("Open today from ");
-                hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
+                hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourOpen()));
                 hoursTextBuilder.append(" to ");
-                hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
+                hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourClosed()));
                 hoursTextBuilder.append(".");
                 setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.argb(255, 128, 128, 128));
             }

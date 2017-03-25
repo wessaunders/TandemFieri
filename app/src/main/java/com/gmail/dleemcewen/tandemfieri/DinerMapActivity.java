@@ -222,8 +222,8 @@ public class DinerMapActivity extends FragmentActivity implements GoogleApiClien
 
                                                 Day dayHours = deliveryHours.get(0).getDays().get(dayOfWeek);
                                                 if (dayHours.isOpen()) {
-                                                    if (compareOpenTimeWithCurrentTime(dayHours.getHourOpen())) {
-                                                        if (compareClosedTimeWithCurrentTime(dayHours.getHourClosed())) {
+                                                    if (dayHours.compareOpenTimeWithCurrentTime(dayHours.getHourOpen(), currentDate)) {
+                                                        if (dayHours.compareClosedTimeWithCurrentTime(dayHours.getHourClosed(), currentDate)) {
                                                             controlString = "OPEN";
                                                             Intent intent = new Intent(DinerMapActivity.this, LookAtMenuActivity.class);
                                                             Bundle bundle = new Bundle();
@@ -599,22 +599,22 @@ public class DinerMapActivity extends FragmentActivity implements GoogleApiClien
 
                             Day dayHours = deliveryHours.get(0).getDays().get(dayOfWeek);
                             if (dayHours.isOpen()) {
-                                if (compareOpenTimeWithCurrentTime(dayHours.getHourOpen())) {
-                                    if (compareClosedTimeWithCurrentTime(dayHours.getHourClosed())) {
+                                if (dayHours.compareOpenTimeWithCurrentTime(dayHours.getHourOpen(), currentDate)) {
+                                    if (dayHours.compareClosedTimeWithCurrentTime(dayHours.getHourClosed(), currentDate)) {
                                         hoursTextBuilder.append("CURRENTLY OPEN. ");
                                         hoursTextBuilder.append("Open today from ");
-                                        hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
+                                        hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourOpen()));
                                         hoursTextBuilder.append(" to ");
-                                        hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
+                                        hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourClosed()));
                                         hoursTextBuilder.append(".");
                                         bool = true;
                                         //setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.BLUE);
                                     } else {
                                         hoursTextBuilder.append("CLOSED. ");
                                         hoursTextBuilder.append("Open today from ");
-                                        hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
+                                        hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourOpen()));
                                         hoursTextBuilder.append(" to ");
-                                        hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
+                                        hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourClosed()));
                                         hoursTextBuilder.append(".");
                                         bool = false;
                                         //setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.argb(255, 128, 128, 128));
@@ -622,9 +622,9 @@ public class DinerMapActivity extends FragmentActivity implements GoogleApiClien
                                 } else {
                                     hoursTextBuilder.append("CURRENTLY CLOSED. ");
                                     hoursTextBuilder.append("Open today from ");
-                                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourOpen()));
+                                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourOpen()));
                                     hoursTextBuilder.append(" to ");
-                                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandard(dayHours.getHourClosed()));
+                                    hoursTextBuilder.append(DateFormatter.convertMilitaryTimeToStandardString(dayHours.getHourClosed()));
                                     hoursTextBuilder.append(".");
                                     bool = false;
                                    //setRestaurantHoursText(hoursTextBuilder.toString(), restaurantOpenClosed, Color.argb(255, 128, 128, 128));
@@ -644,17 +644,6 @@ public class DinerMapActivity extends FragmentActivity implements GoogleApiClien
 
                 });
         return bool;
-    }
-
-
-    private boolean compareOpenTimeWithCurrentTime(int hourOpen) {
-        int currentMilitaryTime = DateFormatter.convertStandardTimeToMilitaryTime(currentDate);
-        return currentMilitaryTime > hourOpen;
-    }
-
-    private boolean compareClosedTimeWithCurrentTime(int hourClosed) {
-        int currentMilitaryTime = DateFormatter.convertStandardTimeToMilitaryTime(currentDate);
-        return currentMilitaryTime < hourClosed;
     }
 
     private int getDayOfWeekFromCurrentDate() {
