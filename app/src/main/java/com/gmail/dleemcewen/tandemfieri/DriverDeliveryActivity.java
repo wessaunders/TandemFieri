@@ -24,12 +24,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gmail.dleemcewen.tandemfieri.Constants.NotificationConstants;
+import com.gmail.dleemcewen.tandemfieri.Entities.NotificationMessage;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
 import com.gmail.dleemcewen.tandemfieri.Entities.OrderItem;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Enums.OrderEnum;
 import com.gmail.dleemcewen.tandemfieri.Json.AddressGeocode.AddressGeocode;
+import com.gmail.dleemcewen.tandemfieri.Repositories.NotificationMessages;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -74,6 +77,7 @@ public class DriverDeliveryActivity extends AppCompatActivity implements GoogleA
     private User user;
     private TextView subTotal, tax, total, restaurantName, orderDate;
     private ListView viewOrderItems;
+    private NotificationMessages<NotificationMessage> notifications;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +108,7 @@ public class DriverDeliveryActivity extends AppCompatActivity implements GoogleA
         customerLocation.setLongitude(lon);
         customerLocation.setLatitude(lat);
 
-
+        notifications = new NotificationMessages<>(DriverDeliveryActivity.this);
 
         navigateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,6 +208,10 @@ public class DriverDeliveryActivity extends AppCompatActivity implements GoogleA
                     mDatabaseRemoval.child("Order").child(ownerId).child(order.getOrderId()).child("status").setValue(OrderEnum.COMPLETE);
                     finish();
                     Toast.makeText(getApplicationContext(), "Finish the delivery yah dingus", Toast.LENGTH_LONG).show();
+
+                    //TODO: send notification to diner for driver rating
+                    order.setStatus(OrderEnum.COMPLETE);
+                    notifications.sendNotification(NotificationConstants.Action.ADDED, order);
                 }
             }
         });

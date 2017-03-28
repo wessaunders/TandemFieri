@@ -24,6 +24,7 @@ import com.gmail.dleemcewen.tandemfieri.Logging.ToastLogger;
 import com.gmail.dleemcewen.tandemfieri.Publishers.NotificationPublisher;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
 import com.gmail.dleemcewen.tandemfieri.Subscribers.DinerSubscriber;
+import com.gmail.dleemcewen.tandemfieri.Subscribers.DriverSubscriber;
 import com.gmail.dleemcewen.tandemfieri.Subscribers.RestaurantSubscriber;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
 import com.gmail.dleemcewen.tandemfieri.Utility.BraintreeUtil;
@@ -284,6 +285,22 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtras(bundle);
             startActivity(intent);
         }else if(driver != null){
+            List<Object> restaurantIds = new ArrayList<>();
+            restaurantIds.add(driver.getRestaurantId());
+
+            List<Object> orderStatuses = new ArrayList<>();
+            orderStatuses.add(OrderEnum.EN_ROUTE.toString());
+
+            List<SubscriberFilter> subscriberFilters = new ArrayList<>();
+            subscriberFilters.add(new SubscriberFilter("restaurantId", restaurantIds));
+            subscriberFilters.add(new SubscriberFilter("status", orderStatuses));
+
+            //register new driver subscriber
+            registerNewSubscriber(new DriverSubscriber(
+                    MainActivity.this,
+                    driver,
+                    subscriberFilters));
+
             intent = new Intent(MainActivity.this, DriverMainMenu.class);
             bundle.putSerializable("User", driver);
             intent.putExtras(bundle);
@@ -303,8 +320,13 @@ public class MainActivity extends AppCompatActivity {
                             restaurantIds.add(ownerRestaurant.getKey());
                         }
 
+                        List<Object> orderStatuses = new ArrayList<>();
+                        orderStatuses.add(OrderEnum.CREATING.toString());
+
                         List<SubscriberFilter> subscriberFilters = new ArrayList<>();
                         subscriberFilters.add(new SubscriberFilter("restaurantId", restaurantIds));
+                        subscriberFilters.add(new SubscriberFilter("status", orderStatuses));
+
 
                         //register new restaurant subscriber
                         registerNewSubscriber(new RestaurantSubscriber(
