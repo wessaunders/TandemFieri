@@ -432,6 +432,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("notificationType", childNotificationMessageRecord.getNotificationType());
         intent.putExtra("entity", (Serializable) childNotificationMessageRecord.getData());
         intent.putExtra("key", childNotificationMessageRecord.getKey());
+        intent.putExtra("userId", childNotificationMessageRecord.getUserId());
         MainActivity.this.startService(intent);
     }
 

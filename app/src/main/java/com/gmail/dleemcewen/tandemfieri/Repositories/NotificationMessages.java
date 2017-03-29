@@ -101,6 +101,7 @@ public class NotificationMessages<T extends Entity> extends Repository<Notificat
         intent.putExtra("notificationType", childNotificationMessageRecord.getNotificationType());
         intent.putExtra("entity", (Serializable) childNotificationMessageRecord.getData());
         intent.putExtra("key", childNotificationMessageRecord.getKey());
+        intent.putExtra("userId", childNotificationMessageRecord.getUserId());
         context.startService(intent);
     }
 

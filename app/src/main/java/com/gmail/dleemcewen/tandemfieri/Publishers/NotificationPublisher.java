@@ -88,6 +88,7 @@ public class NotificationPublisher implements IPublish {
 
                     if (!filterResults.contains(false)) {
                         entityHashMap.put("notificationId", notification.getString("notificationId"));
+                        entityHashMap.put("userId", notification.getString("userId"));
                         subscriber.update(notification);
                     }
                 } else {
