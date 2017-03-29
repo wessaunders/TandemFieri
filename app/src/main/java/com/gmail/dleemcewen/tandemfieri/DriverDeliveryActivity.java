@@ -198,9 +198,9 @@ public class DriverDeliveryActivity extends AppCompatActivity implements GoogleA
         completeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if((currentLocation.distanceTo(customerLocation) * 0.000621371) > 0.1){
-                    Toast.makeText(getApplicationContext(), "You are not there yet", Toast.LENGTH_LONG).show();
-                }else {
+                //if((currentLocation.distanceTo(customerLocation) * 0.000621371) > 0.1){
+                //    Toast.makeText(getApplicationContext(), "You are not there yet", Toast.LENGTH_LONG).show();
+                //}else {
                     mDatabaseRemoval.child("Delivery").child(user.getAuthUserID()).child("Order").child(order.getCustomerId()).child(order.getOrderId()).removeValue();
                     mDatabaseRemoval.child("Delivery").child(user.getAuthUserID()).child("currentOrderId").removeValue();
                     mDatabaseRemoval.child("Delivery Location").child(order.getCustomerId()).child("Latitude").removeValue();
@@ -209,10 +209,9 @@ public class DriverDeliveryActivity extends AppCompatActivity implements GoogleA
                     finish();
                     Toast.makeText(getApplicationContext(), "Finish the delivery yah dingus", Toast.LENGTH_LONG).show();
 
-                    //TODO: send notification to diner for driver rating
-                    order.setStatus(OrderEnum.COMPLETE);
-                    notifications.sendNotification(NotificationConstants.Action.ADDED, order);
-                }
+                    //send notification to diner for driver rating
+                    sendNotificationToDiner(order, user);
+                //}
             }
         });
 
@@ -444,6 +443,9 @@ public class DriverDeliveryActivity extends AppCompatActivity implements GoogleA
         }
     }
 
-
+    private void sendNotificationToDiner(Order order, User user) {
+        order.setStatus(OrderEnum.COMPLETE);
+        notifications.sendNotification(NotificationConstants.Action.ADDED, order, user.getAuthUserID());
+    }
 
 }

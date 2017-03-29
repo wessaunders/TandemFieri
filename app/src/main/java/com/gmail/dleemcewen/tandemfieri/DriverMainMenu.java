@@ -71,26 +71,29 @@ public class DriverMainMenu extends AppCompatActivity {
         mDatabaseDelivery = FirebaseDatabase.getInstance().getReference().child("Delivery").child(user.getAuthUserID()).child("Order");
         mDatabaseCurrentDelivery = FirebaseDatabase.getInstance().getReference().child("Delivery").child(user.getAuthUserID());
 
-        int notificationId = bundle.getInt("notificationId");
-        boolean acceptDelivery = bundle.getBoolean("acceptDelivery");
-
+        final int notificationId = bundle.getInt("notificationId");
         if (notificationId != 0) {
             NotificationManager notificationManager =
                     (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
 
             notificationManager.cancel(notificationId);
 
-            notifications
-                .find("notificationId = '" + notificationId + "'")
-                .addOnCompleteListener(DriverMainMenu.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
-                    @Override
-                    public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
-                        List<NotificationMessage> messages = task.getResult().getResults();
-                        if (!messages.isEmpty()) {
-                            notifications.remove(messages.get(0));
-                        }
-                    }
-                });
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    notifications
+                        .find("notificationId = '" + notificationId + "'")
+                        .addOnCompleteListener(DriverMainMenu.this, new OnCompleteListener<TaskResult<NotificationMessage>>() {
+                            @Override
+                            public void onComplete(@NonNull Task<TaskResult<NotificationMessage>> task) {
+                                List<NotificationMessage> messages = task.getResult().getResults();
+                                if (!messages.isEmpty()) {
+                                    notifications.remove(messages.get(0));
+                                }
+                            }
+                        });
+                }
+            }).start();
         }//end notification block
 
         mDatabaseDelivery.addValueEventListener(new ValueEventListener() {

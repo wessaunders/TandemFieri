@@ -106,8 +106,11 @@ public class ManageOrders extends AppCompatActivity {
                         mDatabase.child("Order").child(owner.getAuthUserID()).child(order.getOrderId()).child("Assigned").setValue("True");
                         mDatabase.child("Order").child(owner.getAuthUserID()).child(order.getOrderId()).child("status").setValue(OrderEnum.EN_ROUTE);
 
+                        //make sure to set the order status to en_route directly in the order object
+                        order.setStatus(OrderEnum.EN_ROUTE);
+
                         //send notification to driver
-                        notifications.sendNotification(NotificationConstants.Action.ADDED, order);
+                        notifications.sendNotification(NotificationConstants.Action.ADDED, order, user.getAuthUserID());
                     }
                 }
                 controlBool = false;
@@ -115,8 +118,6 @@ public class ManageOrders extends AppCompatActivity {
 
         });
 
-        // This is causing an error....
-        // doesn't look like Order is ever added to the bundle
         order = (Order) bundle.getSerializable("Order");
         restID = order.getRestaurantId();
 

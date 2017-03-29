@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gmail.dleemcewen.tandemfieri.Entities.NotificationMessage;
 import com.gmail.dleemcewen.tandemfieri.Entities.Restaurant;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Enums.OrderEnum;
@@ -23,6 +24,7 @@ import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.gmail.dleemcewen.tandemfieri.Logging.ToastLogger;
 import com.gmail.dleemcewen.tandemfieri.Publishers.NotificationPublisher;
 import com.gmail.dleemcewen.tandemfieri.Repositories.Restaurants;
+import com.gmail.dleemcewen.tandemfieri.Services.NotificationService;
 import com.gmail.dleemcewen.tandemfieri.Subscribers.DinerSubscriber;
 import com.gmail.dleemcewen.tandemfieri.Subscribers.DriverSubscriber;
 import com.gmail.dleemcewen.tandemfieri.Subscribers.RestaurantSubscriber;
@@ -33,6 +35,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,6 +49,7 @@ import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private User user;
     private Resources resources;
     private Restaurants<Restaurant> restaurantsRepository;
+    private DatabaseReference dataContext;
+    private boolean sendNotificationMessages = false;
+    private ChildEventListener notificationChildEventListener;
 
     private boolean verifiedEmailNotRequiredForLogin;
 
@@ -78,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         resources = getResources();
         setupLogging();
+        registerNotificationListener();
         verifiedEmailNotRequiredForLogin = resources.getBoolean(R.bool.verified_email_not_required_for_login);
         //this if statement is used when the user clicks the sign out option from the drop down menu
         //it closed all open activities and then the main activity.
@@ -354,6 +362,79 @@ public class MainActivity extends AppCompatActivity {
         notificationPublisher.subscribe(subscriber);
     }
 
+    private void resetSubscribers() {
+        NotificationPublisher notificationPublisher = NotificationPublisher.getInstance();
+        List<ISubscriber> subscribers = notificationPublisher.getSubscribers();
+
+        for (ISubscriber subscriber : subscribers) {
+            notificationPublisher.unsubscribe(subscriber);
+        }
+    }
+
+    private void registerNotificationListener() {
+        dataContext = FirebaseDatabase.getInstance().getReference(NotificationMessage.class.getSimpleName());
+
+        notificationChildEventListener = dataContext.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (sendNotificationMessages) {
+                    NotificationMessage childNotificationMessageRecord = dataSnapshot.getValue(NotificationMessage.class);
+                    childNotificationMessageRecord.setKey(dataSnapshot.getKey());
+
+                    sendNotificationMessage(childNotificationMessageRecord);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                //not implemented
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                //not implemented
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                //not implemented
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //not implemented
+            }
+        });
+        dataContext.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                sendNotificationMessages = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    /**
+     * sendNotificationMessage sends a notification message to the notification service that
+     * contains the information in the provided NotificationMessage record
+     * @param childNotificationMessageRecord indicates the notificationmessage record which contains
+     *                                       the data to send to the notification service
+     */
+    private void sendNotificationMessage(NotificationMessage childNotificationMessageRecord) {
+        Intent intent = new Intent(MainActivity.this, NotificationService.class);
+        intent.setAction(childNotificationMessageRecord.getAction());
+        intent.putExtra("notificationId", childNotificationMessageRecord.getNotificationId());
+        intent.putExtra("notificationType", childNotificationMessageRecord.getNotificationType());
+        intent.putExtra("entity", (Serializable) childNotificationMessageRecord.getData());
+        intent.putExtra("key", childNotificationMessageRecord.getKey());
+        MainActivity.this.startService(intent);
+    }
+
     private void clear(){
         email.setText("");
         password.setText("");
@@ -363,6 +444,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(authenticatorListener);
+        resetSubscribers();
     }
 
     @Override
