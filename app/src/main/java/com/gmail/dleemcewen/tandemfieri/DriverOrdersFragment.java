@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.gmail.dleemcewen.tandemfieri.Adapters.DriverOrdersListAdapter;
 import com.gmail.dleemcewen.tandemfieri.Entities.Delivery;
@@ -19,7 +20,6 @@ import com.gmail.dleemcewen.tandemfieri.Repositories.Deliveries;
 import com.gmail.dleemcewen.tandemfieri.Tasks.TaskResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ import java.util.List;
 public class DriverOrdersFragment extends DialogFragment {
     private String driverId;
     private String restaurantId;
+    private String customerId;
     private RelativeLayout myDeliveriesLayout;
     private ListView myDeliveriesList;
     private DriverOrdersListAdapter listAdapter;
@@ -82,7 +83,7 @@ public class DriverOrdersFragment extends DialogFragment {
         if (getArguments() != null) {
             driverId = getArguments().getString("driverId");
             restaurantId = getArguments().getString("restaurantId");
-            order = (Order) getArguments().getSerializable("Order");
+            customerId = getArguments().getString("customerId");
         }
 
         driverOrders = new ArrayList<>();
@@ -94,7 +95,6 @@ public class DriverOrdersFragment extends DialogFragment {
     private void findControlReferences(View view) {
         myDeliveriesLayout = (RelativeLayout)view.findViewById(R.id.myDeliveriesLayout);
         myDeliveriesList = (ListView)myDeliveriesLayout.findViewById(R.id.myDeliveriesList);
-        closeMyOrders = (Button)myDeliveriesLayout.findViewById(R.id.closeMyOrders);
         selectCurrentDelivery = (Button)myDeliveriesLayout.findViewById(R.id.selectCurrentDelivery);
     }
 
@@ -102,24 +102,17 @@ public class DriverOrdersFragment extends DialogFragment {
      * bind required event handlers
      */
     private void bindEventHandlers() {
-        closeMyOrders.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DriverOrdersFragment.this.dismiss();
-            }
-        });
-
         selectCurrentDelivery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DriverOrdersFragment.this.dismiss();
-
                 FirebaseDatabase
                     .getInstance()
                     .getReference(Delivery.class.getSimpleName())
                     .child(driverId)
                     .child("currentOrderId")
-                    .setValue(currentOrder.getCustomerId());
+                    .setValue(((DriverMainMenu)getActivity()).getCurrentOrder().getOrderId());
+
+                Toast.makeText(getActivity().getApplicationContext(), "Order Selected.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -128,13 +121,12 @@ public class DriverOrdersFragment extends DialogFragment {
      * retrieve data
      */
     private void retrieveData() {
-        if (order != null) {
-            deliveriesRepository = (Deliveries<Delivery>)deliveriesRepository
+        deliveriesRepository = (Deliveries<Delivery>) deliveriesRepository
                 .atNode(driverId)
                 .atNode("Order")
-                .atNode(order.getCustomerId());
+                .atNode(customerId);
 
-            deliveriesRepository
+        deliveriesRepository
                 .findOrders("status != '" + OrderEnum.COMPLETE.toString() + "'")
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<TaskResult<Order>>() {
                     @Override
@@ -151,7 +143,6 @@ public class DriverOrdersFragment extends DialogFragment {
                         myDeliveriesList.setAdapter(listAdapter);
                     }
                 });
-        }
     }
 
     /**
@@ -161,6 +152,6 @@ public class DriverOrdersFragment extends DialogFragment {
     public void setSelectedIndex(int index) {
         listAdapter.setSelectedIndex(index);
         listAdapter.notifyDataSetChanged();
-        currentOrder = driverOrders.get(index);
+        ((DriverMainMenu)getActivity()).setCurrentOrder(driverOrders.get(index));
     }
 }
