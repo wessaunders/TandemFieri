@@ -50,15 +50,6 @@ public class DriverSubscriber implements ISubscriber {
     }
 
     /**
-     * Optional constructor
-     * @param context indicates the current application context
-     */
-    public DriverSubscriber(Context context) {
-        this.context = context;
-        this.filters = null;
-    }
-
-    /**
      * getNotificationType returns the type of notifications the subscriber wishes to receive
      *
      * @return notification type
@@ -76,6 +67,11 @@ public class DriverSubscriber implements ISubscriber {
     @Override
     public List<SubscriberFilter> getFilters() {
         return filters;
+    }
+
+    @Override
+    public User getUser() {
+        return driverUser;
     }
 
     /**

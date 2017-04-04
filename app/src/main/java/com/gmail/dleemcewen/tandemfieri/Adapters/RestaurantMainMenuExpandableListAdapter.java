@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gmail.dleemcewen.tandemfieri.Constants.NotificationConstants;
+import com.gmail.dleemcewen.tandemfieri.Entities.NotificationMessage;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
 import com.gmail.dleemcewen.tandemfieri.Enums.OrderEnum;
@@ -26,6 +28,7 @@ import com.gmail.dleemcewen.tandemfieri.Events.ActivityEvent;
 import com.gmail.dleemcewen.tandemfieri.Json.Braintree.Transaction;
 import com.gmail.dleemcewen.tandemfieri.ManageOrders;
 import com.gmail.dleemcewen.tandemfieri.R;
+import com.gmail.dleemcewen.tandemfieri.Repositories.NotificationMessages;
 import com.gmail.dleemcewen.tandemfieri.ViewOrderActivity;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -60,6 +63,7 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
     private Button manage_button;
     private User user;
     private ProgressDialog mDialog;
+    private NotificationMessages<NotificationMessage> notifications;
 
     public RestaurantMainMenuExpandableListAdapter(Activity context, List<Order> orderList,
                                                    Map<String, List<Order>> childList, User user) {
@@ -260,6 +264,7 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
                                     detail.transactionID,
                                     user.getAuthUserID(),
                                     order.getOrderId(),
+                                    order.getCustomerId(),
                                     isENROUTE);
                         } else {
                             Log.v("Braintree:", "FindTransaction: " + detail.error);
@@ -284,7 +289,7 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
         //End rest api
     }
 
-    private void processRefund(RefundTypeEnum type, String transactionID, final String ownerID, final String orderID, final boolean isENROUTE) {
+    private void processRefund(RefundTypeEnum type, String transactionID, final String ownerID, final String orderID, final String customerId, final boolean isENROUTE) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
 
@@ -319,6 +324,10 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
                                     .post(new ActivityEvent(ActivityEvent.Result.REFRESH_RESTAURANT_MAIN_MENU));
 
                             if (isENROUTE) {
+                                //Send refunded notification to diner
+                                notifications
+                                    .sendNotification(NotificationConstants.Action.ADDED, order, customerId);
+
                                 //// TODO: 3/29/2017 Send Notification to Driver
                                 //  TODO: clean up driver delivery in firebase
                             }

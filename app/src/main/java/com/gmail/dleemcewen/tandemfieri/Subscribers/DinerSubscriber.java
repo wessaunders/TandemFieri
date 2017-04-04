@@ -41,15 +41,6 @@ public class DinerSubscriber implements ISubscriber {
         this.filters = filters;
     }
 
-    /**
-     * Optional constructor
-     * @param context indicates the current application context
-     */
-    public DinerSubscriber(Context context) {
-        this.context = context;
-        this.filters = null;
-    }
-
     @Override
     public String getNotificationType() {
         return notificationType;
@@ -58,6 +49,11 @@ public class DinerSubscriber implements ISubscriber {
     @Override
     public List<SubscriberFilter> getFilters() {
         return filters;
+    }
+
+    @Override
+    public User getUser() {
+        return dinerUser;
     }
 
     @Override
