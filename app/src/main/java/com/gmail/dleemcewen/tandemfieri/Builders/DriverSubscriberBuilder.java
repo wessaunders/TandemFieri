@@ -27,27 +27,32 @@ public class DriverSubscriberBuilder {
         List<Object> restaurantIds = new ArrayList<>();
         restaurantIds.add(driver.getRestaurantId());
 
-        List<Object> orderStatuses = new ArrayList<>();
-        orderStatuses.add(OrderEnum.EN_ROUTE.toString());
+        List<Object> enrouteOrderStatuses = new ArrayList<>();
+        enrouteOrderStatuses.add(OrderEnum.EN_ROUTE.toString());
 
-        List<SubscriberFilter> subscriberFilters = new ArrayList<>();
-        subscriberFilters.add(new SubscriberFilter("restaurantId", restaurantIds));
-        subscriberFilters.add(new SubscriberFilter("status", orderStatuses));
+        List<SubscriberFilter> enrouteSubscriberFilters = new ArrayList<>();
+        enrouteSubscriberFilters.add(new SubscriberFilter("restaurantId", restaurantIds));
+        enrouteSubscriberFilters.add(new SubscriberFilter("status", enrouteOrderStatuses));
 
         ISubscriber enrouteSubscriber = new DriverSubscriber(
                 context,
                 driver,
-                subscriberFilters);
+                enrouteSubscriberFilters);
 
-        orderStatuses.clear();
-        orderStatuses.add(OrderEnum.REFUNDED.toString());
+        subscribers.add(enrouteSubscriber);
+
+        List<Object> refundedOrderStatuses = new ArrayList<>();
+        refundedOrderStatuses.add(OrderEnum.REFUNDED.toString());
+
+        List<SubscriberFilter> refundedSubscriberFilters = new ArrayList<>();
+        refundedSubscriberFilters.add(new SubscriberFilter("restaurantId", restaurantIds));
+        refundedSubscriberFilters.add(new SubscriberFilter("status", refundedOrderStatuses));
 
         ISubscriber refundedSubscriber = new DriverSubscriber(
                 context,
                 driver,
-                subscriberFilters);
+                refundedSubscriberFilters);
 
-        subscribers.add(enrouteSubscriber);
         subscribers.add(refundedSubscriber);
 
         subscriberBuilderCompleteListener.onBuildComplete(subscribers);

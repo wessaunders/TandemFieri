@@ -27,27 +27,32 @@ public class DinerSubscriberBuilder {
         List<Object> customerIds = new ArrayList<>();
         customerIds.add(diner.getAuthUserID());
 
-        List<Object> orderStatuses = new ArrayList<>();
-        orderStatuses.add(OrderEnum.REFUNDED.toString());
+        List<Object> refundedOrderStatuses = new ArrayList<>();
+        refundedOrderStatuses.add(OrderEnum.REFUNDED.toString());
 
-        List<SubscriberFilter> subscriberFilters = new ArrayList<>();
-        subscriberFilters.add(new SubscriberFilter("customerId", customerIds));
-        subscriberFilters.add(new SubscriberFilter("status", orderStatuses));
+        List<SubscriberFilter> refundedSubscriberFilters = new ArrayList<>();
+        refundedSubscriberFilters.add(new SubscriberFilter("customerId", customerIds));
+        refundedSubscriberFilters.add(new SubscriberFilter("status", refundedOrderStatuses));
 
         ISubscriber refundSubscriber = new DinerSubscriber(
                 context,
                 diner,
-                subscriberFilters);
+                refundedSubscriberFilters);
 
-        orderStatuses.clear();
-        orderStatuses.add(OrderEnum.COMPLETE.toString());
+        subscribers.add(refundSubscriber);
+
+        List<Object> completedOrderStatuses = new ArrayList<>();
+        completedOrderStatuses.add(OrderEnum.COMPLETE.toString());
+
+        List<SubscriberFilter> completedSubscriberFilters = new ArrayList<>();
+        completedSubscriberFilters.add(new SubscriberFilter("customerId", customerIds));
+        completedSubscriberFilters.add(new SubscriberFilter("status", completedOrderStatuses));
 
         ISubscriber completedSubscriber = new DinerSubscriber(
                 context,
                 diner,
-                subscriberFilters);
+                completedSubscriberFilters);
 
-        subscribers.add(refundSubscriber);
         subscribers.add(completedSubscriber);
 
         subscriberBuilderCompleteListener.onBuildComplete(subscribers);

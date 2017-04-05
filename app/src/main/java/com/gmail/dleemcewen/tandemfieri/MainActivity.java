@@ -342,8 +342,8 @@ public class MainActivity extends AppCompatActivity {
         NotificationPublisher notificationPublisher = NotificationPublisher.getInstance();
         List<ISubscriber> subscribers = notificationPublisher.getSubscribers();
 
-        for (ISubscriber subscriber : subscribers) {
-            notificationPublisher.unsubscribe(subscriber);
+        for (int index = subscribers.size() - 1; index > -1; index--) {
+            notificationPublisher.unsubscribe(subscribers.get(index));
         }
     }
 
