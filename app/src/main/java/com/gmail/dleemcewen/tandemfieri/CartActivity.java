@@ -157,14 +157,13 @@ public class CartActivity extends AppCompatActivity {
                     finish();
                 }
 
-                /*if (nonce == null || nonce.getNonce().equals("")) {
+                if (nonce == null || nonce.getNonce().equals("")) {
                     Toast.makeText(getApplicationContext(),
                             "Please select a payment method.",
                             Toast.LENGTH_LONG).show();
                 } else {
                     submitPayment();
-                }*/
-                submitPayment();
+                }
             }
         });
 
@@ -187,22 +186,6 @@ public class CartActivity extends AppCompatActivity {
             }
         });
     }
-
-    /*private void submitPayment() {
-        order.setStatus(OrderEnum.CREATING);
-        mDatabase.child("Order").child(ownerId).child(order.getKey()).setValue(order);
-
-        Toast.makeText(getApplicationContext(),
-                "Order completed.",
-                Toast.LENGTH_LONG).show();
-
-        notificationsRepository
-                .sendNotification(NotificationConstants.Action.ADDED, order, uid);
-
-        enableDeliveryMap();
-
-        finish();
-    }*/
 
     private void submitPayment() {
         mDatabase.child("Order").child(ownerId).child(order.getKey()).setValue(order);

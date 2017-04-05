@@ -221,50 +221,6 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
         alertDialog.show();
     }
 
-    /*private void findTransaction(final Order order, final User user, final TextView reason) {
-        Transaction detail = new Transaction();
-        detail.success = "true";
-        detail.transactionID = "12345";
-
-        RefundTypeEnum type = RefundTypeEnum.REFUND;
-
-        boolean isENROUTE = (order.getStatus() == OrderEnum.EN_ROUTE) ? true : false;
-
-        processRefund(type,
-                detail.transactionID,
-                user.getAuthUserID(),
-                order.getOrderId(),
-                order.getCustomerId(),
-                isENROUTE,
-                reason);
-    }
-
-    private void processRefund(RefundTypeEnum type, String transactionID, final String ownerID, final String orderID, final String customerId, final boolean isENROUTE, final TextView reason) {
-        Log.v("Braintree", "Order refunded");
-
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("Order").child(ownerID).child(orderID).child("status").setValue(OrderEnum.REFUNDED);
-        mDatabase.child("Order").child(ownerID).child(orderID).child("refundReason").setValue(reason.getText().toString());
-
-        EventBus.getDefault()
-                .post(new ActivityEvent(ActivityEvent.Result.REFRESH_RESTAURANT_MAIN_MENU));
-
-        //Send refunded notification to diner
-        notifications
-                .sendNotification(NotificationConstants.Action.ADDED, order, customerId);
-
-        if (isENROUTE) {
-            //// TODO: 3/29/2017 Send Notification to Driver
-            //  TODO: clean up driver delivery in firebase
-        }
-
-        Toast.makeText(context,
-                "Order refunded.",
-                Toast.LENGTH_LONG).show();
-
-        mDialog.hide();
-    }*/
-
     private void findTransaction(final Order order, final User user, final TextView reason) {
         if (order.getStatus() == OrderEnum.PAYMENT_PENDING) {
             Toast.makeText(context, "Unable to refund. Payment never submitted.", Toast.LENGTH_LONG).show();
