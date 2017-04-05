@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -182,13 +181,7 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
     }//end get child view
 
     private void refundDialog(final Order order, final User user) {
-        LayoutInflater li = LayoutInflater.from(context);
-        View view = li.inflate(R.layout.dialog_restaurant_refund, null);
-
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        alertDialogBuilder.setView(view);
-
-        final EditText comments = (EditText) view.findViewById(R.id.et_refund_comment);
 
         alertDialogBuilder
                 .setCancelable(false)
@@ -196,18 +189,12 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
                 .setPositiveButton(context.getString(R.string.yes),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                if (General.isEditTextEmpty(comments)) {
-                                    Toast.makeText(context, "Please enter the refund reason.", Toast.LENGTH_LONG).show();
-                                    dialog.cancel();
-                                    return;
-                                }
-
                                 mDialog = new ProgressDialog(context);
                                 mDialog.setMessage("Processing refund!");
                                 mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                                 mDialog.show();
 
-                                findTransaction(order, user, comments);
+                                findTransaction(order, user);
                             }
                         })
                 .setNegativeButton(context.getString(R.string.no),
@@ -221,7 +208,7 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
         alertDialog.show();
     }
 
-    private void findTransaction(final Order order, final User user, final TextView reason) {
+    private void findTransaction(final Order order, final User user) {
         if (order.getStatus() == OrderEnum.PAYMENT_PENDING) {
             Toast.makeText(context, "Unable to refund. Payment never submitted.", Toast.LENGTH_LONG).show();
             return;
