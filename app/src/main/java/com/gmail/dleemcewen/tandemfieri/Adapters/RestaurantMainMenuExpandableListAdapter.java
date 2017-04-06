@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gmail.dleemcewen.tandemfieri.Constants.NotificationConstants;
+import com.gmail.dleemcewen.tandemfieri.Entities.Delivery;
 import com.gmail.dleemcewen.tandemfieri.Entities.NotificationMessage;
 import com.gmail.dleemcewen.tandemfieri.Entities.Order;
 import com.gmail.dleemcewen.tandemfieri.Entities.User;
@@ -30,11 +30,14 @@ import com.gmail.dleemcewen.tandemfieri.Json.Braintree.Transaction;
 import com.gmail.dleemcewen.tandemfieri.Logging.LogWriter;
 import com.gmail.dleemcewen.tandemfieri.ManageOrders;
 import com.gmail.dleemcewen.tandemfieri.R;
+import com.gmail.dleemcewen.tandemfieri.Repositories.Deliveries;
 import com.gmail.dleemcewen.tandemfieri.Repositories.NotificationMessages;
-import com.gmail.dleemcewen.tandemfieri.Utility.General;
 import com.gmail.dleemcewen.tandemfieri.ViewOrderActivity;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpClient;
@@ -59,14 +62,12 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
     private Activity context;
     private List<Order> orderList;
     private Map<String, List<Order>> childList;
-    private Resources resources;
     private DatabaseReference mDatabase;
     private TextView orderName;
-    private LayoutInflater inflater;
-    private Button manage_button;
     private User user;
     private ProgressDialog mDialog;
     private NotificationMessages<NotificationMessage> notifications;
+    private Deliveries<Delivery> deliveries;
 
     public RestaurantMainMenuExpandableListAdapter(Activity context, List<Order> orderList,
                                                    Map<String, List<Order>> childList, User user) {
@@ -341,12 +342,31 @@ public class RestaurantMainMenuExpandableListAdapter extends BaseExpandableListA
 
                             //Send refunded notification to diner
                             notifications
-                                .sendNotification(NotificationConstants.Action.ADDED, order, order.getCustomerId());
+                                .sendNotification(NotificationConstants.Action.REMOVED, order, order.getCustomerId());
 
                             if (isENROUTE) {
+                                //Send Notification to Driver
+                                DatabaseReference deliveryDatabase = FirebaseDatabase.getInstance().getReference("Delivery");
+                                deliveryDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        deliveries = new Deliveries<>(context);
+                                        String driverId = deliveries.findDriverIdForOrder(order.getOrderId(), dataSnapshot);
 
-                                //// TODO: 3/29/2017 Send Notification to Driver
-                                //  TODO: clean up driver delivery in firebase
+                                        notifications = new NotificationMessages<>(context);
+                                        notifications.sendNotification(NotificationConstants.Action.REMOVED, order, driverId);
+
+                                        //clean up delivery and delivery location in firebase
+                                        mDatabase.child("Delivery").child(driverId).child("Order").child(order.getCustomerId()).child(order.getOrderId()).removeValue();
+                                        mDatabase.child("Delivery").child(driverId).child("currentOrderId").removeValue();
+                                        mDatabase.child("Delivery Location").child(order.getCustomerId()).removeValue();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        //not implemented
+                                    }
+                                });
                             }
 
                             EventBus.getDefault()
