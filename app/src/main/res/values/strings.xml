@@ -22,6 +22,7 @@
     <string name="hintCity">City</string>
     <string name="hintState">State</string>
     <string name="hintCategories">Categories</string>
+    <string name="generate_csv">Generate CSV</string>
     <string name="removeItem">To remove an item from your order, long press on the item.</string>
     <string name="hintZip">Zip</string>
     <string name="hintPhone">Phone Number</string>
@@ -61,7 +62,7 @@
     <string name="removeConfirmationQuestion">Are you sure you want to remove</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>

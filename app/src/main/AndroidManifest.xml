@@ -15,6 +15,16 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <provider
+            android:authorities="com.gmail.dleemcewen.tandemfieri"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
         <meta-data
             android:name="android.support.multidex.MultiDexApplication"
             android:value="@string/multiDex" />
@@ -93,8 +103,8 @@
         <activity android:name=".DinerOrderHistoryActivity" />
         <activity android:name=".ViewOrderActivity" />
         <activity android:name=".ProductHistoryActivity" />
-        <activity android:name=".CompetedOrdersDriverActivity"></activity>
-
+        <activity android:name=".CompetedOrdersDriverActivity" />
+        <activity android:name=".ViewMonthlyReportActivity"></activity>
     </application>
 
 </manifest>

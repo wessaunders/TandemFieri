@@ -1,13 +1,13 @@
-package com.gmail.dleemcewen.tandemfieri;
+package com.gmail.dleemcewen.tandemfieri.Entities;
 
 /**
  * Created by Ruth on 3/16/2017.
  */
 
 public class DisplayItem {
-    String name;
-    double basePrice;
-    double total;
+    String name;        //in monthly report this field is used to record restaurant name
+    double basePrice;    //in monthly report this field is used to record refunded orders
+    double total;       //in monthly report this field is used to record completed order totals
     int quantity;
 
     public DisplayItem(String name, double basePrice) {
